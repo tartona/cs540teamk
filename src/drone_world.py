@@ -1,5 +1,7 @@
 import numpy as np
-import math
+from drone_world_object import DroneWorldObjectId
+from drone import Drone
+from block import Block
 
 class DroneWorldBoundsError(Exception):
     def __init__(self, msg):
@@ -28,7 +30,8 @@ class DroneWorld(object):
         self._world = np.empty((x_range, y_range, z_range), dtype=object)
 
         # List of objects populated in the world
-        self._objects = []
+        self._drone = None
+        self._blocks = []
 
     def _x_index(self, x):
         """Function to convert x world location into an array index.
@@ -74,7 +77,11 @@ class DroneWorld(object):
         y_index = self._y_index(y)
         z_index = self._z_index(z)
         self._world[x_index][y_index][z_index] = drone_object
-        self._objects.append(drone_object)
+
+        if drone_object.id == DroneWorldObjectId.DRONE:
+            self._drone = drone_object
+        else:
+            self._blocks.append(drone_object)
 
     def can_move_object(self, cur_x, cur_y, cur_z, new_x, new_y, new_z):
         """Verify that an object can move to the specified location.
@@ -85,19 +92,55 @@ class DroneWorld(object):
     def move_object(self, cur_x, cur_y, cur_z, new_x, new_y, new_z):
         """Move an object to a new (x, y, z) location.
         """
-        cur_x_index = self._x_index(cur_x)
-        cur_y_index = self._y_index(cur_y)
-        cur_z_index = self._z_index(cur_z)
-        new_x_index = self._x_index(new_x)
-        new_y_index = self._y_index(new_y)
-        new_z_index = self._z_index(new_z)
+        try:
+            if self.is_occupied(new_x, new_y, new_z):
+                return False
+
+            cur_x_index = self._x_index(cur_x)
+            cur_y_index = self._y_index(cur_y)
+            cur_z_index = self._z_index(cur_z)
+            new_x_index = self._x_index(new_x)
+            new_y_index = self._y_index(new_y)
+            new_z_index = self._z_index(new_z)
+        except DroneWorldBoundsError:
+            return False
+
         self._world[new_x_index][new_y_index][new_z_index] = self._world[cur_x_index][cur_y_index][cur_z_index]
         self._world[cur_x_index][cur_y_index][cur_z_index] = None
+        return True
+
+    def attach(self):
+        """Attach a block to the drone.
+        """
+        self._drone.attach()
+
+    def release(self):
+        """Release a block from the drone.
+        """
+        self._drone.release()
+
+    def move(self, dx, dy, dz):
+        """Move the drone in the drone world.
+        """
+        self._drone.move(dx, dy, dz)
+
+    def speak(self, msg):
+        """Not implemented.
+        """
+        self._drone.speak(msg)
 
     def state(self):
         """Get the state of all the objects in the drone world.
         """
         state = []
-        for world_object in self._objects:
-            state.append(world_object.state())
+        for block in self._blocks:
+            state.append(block.state())
+        state.append(self._drone.state())
         return state
+
+    def initialize(self, filename):
+        """Initialize the drone world from a file.
+        Not yet implemented.
+        """
+        Drone(self, 0, 0, 0, DroneWorldObjectId.DRONE)
+        Block(self, -1, 1, 0, DroneWorldObjectId.BLUE)
