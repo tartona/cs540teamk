@@ -1,4 +1,4 @@
-from drone_world import DroneWorld
+from drone_world.drone_world import DroneWorld
 
 if __name__ == "__main__":
 
@@ -14,4 +14,8 @@ if __name__ == "__main__":
     # Attach and move with block (as of now, block is hardcoded in world init function)
     world.attach()
     world.move(5,5,5)
+    print world.state()
+
+    # Release the block
+    world.release()
     print world.state()

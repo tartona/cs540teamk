@@ -1,10 +1,6 @@
 from drone_world_object import DroneWorldObject
 from block import Block
 
-class DroneRuntimeError(Exception):
-    def __init__(self, msg):
-        super(DroneRuntimeError, self).__init__(msg)
-
 class Drone(DroneWorldObject):
     def __init__(self, world, x, y, z, object_id):
         super(Drone, self).__init__(world, x, y, z, object_id)
@@ -14,7 +10,7 @@ class Drone(DroneWorldObject):
         """Search for a Block object directly below drone location.
         """
         if self._attached_block:
-            raise DroneRuntimeError("Drone already has an attached block")
+            raise RuntimeError("Drone already has an attached block")
         world_object = self._world.get_object(self.x, self.y - 1, self.z)
         if isinstance(world_object, Block):
             self._attached_block = world_object
@@ -23,7 +19,7 @@ class Drone(DroneWorldObject):
         """Release an attached Block.
         """
         if not self._attached_block:
-            raise DroneRuntimeError("Drone does not have an attached block to be released")
+            raise RuntimeError("Drone does not have an attached block to be released")
         self._attached_block.drop()
         self._attached_block = None
 
@@ -57,6 +53,25 @@ class Drone(DroneWorldObject):
             elif not block_moved and drone_moved:
                 super(Drone, self).move(-dx, -dy, -dz)
         return False
+
+    def actions(self):
+        if not self._attached_block:
+            return super(Drone, self).actions()
+        else:
+            drone_actions = super(Drone, self).actions()
+            block_actions = self._attached_block.actions()
+
+            # Find the intersection of drone and block actions. Note that this does not account
+            # for valid movements along the y-axis since super().actions() will report that the
+            # drone cannot move done since the block is there.
+            actions = list(set(drone_actions) & set(block_actions))
+
+            # Add in y-axis actions
+            if self._world.can_move_object(self.x, self.y + 1, self.z):
+                actions.append((0, 1, 0))
+            if self._world.can_move_object(self._attached_block.x, self._attached_block.y - 1, self._attached_block.z):
+                actions.append((0, -1, 0))
+            return actions
 
     def speak(self, msg):
         """ Not implemented speak function.
