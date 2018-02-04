@@ -58,16 +58,19 @@ class DroneWorldObject(object):
         (dx, dy, dz) for the object.
         """
         valid_actions = []
-        if self._world.can_move_action(self.x, self.y, self.z, self.x + 1, self.y, self.z):
+        if self._world.can_move_object(self.x + 1, self.y, self.z):
             valid_actions.append((1, 0, 0))
-        if self._world.can_move_action(self.x, self.y, self.z, self.x - 1, self.y, self.z):
+        if self._world.can_move_object(self.x - 1, self.y, self.z):
             valid_actions.append((-1, 0, 0))
-        if self._world.can_move_action(self.x, self.y, self.z, self.x, self.y + 1, self.z):
+        if self._world.can_move_object(self.x, self.y + 1, self.z):
             valid_actions.append((0, 1, 0))
-        if self._world.can_move_action(self.x, self.y, self.z, self.x, self.y - 1, self.z):
+        if self._world.can_move_object(self.x, self.y - 1, self.z):
             valid_actions.append((0, -1, 0))
-        if self._world.can_move_action(self.x, self.y, self.z, self.x, self.y, self.z + 1):
+        if self._world.can_move_object(self.x, self.y, self.z + 1):
             valid_actions.append((0, 0, 1))
-        if self._world.can_move_action(self.x, self.y, self.z, self.x, self.y, self.z - 1):
+        if self._world.can_move_object(self.x, self.y, self.z - 1):
             valid_actions.append((0, 0, -1))
         return valid_actions
+
+    def __eq__(self, other):
+        return self.id == other.id and self.x == other.x and self.y == other.y and self.z == other.z
