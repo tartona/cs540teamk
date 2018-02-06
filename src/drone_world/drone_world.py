@@ -24,9 +24,6 @@ class DroneWorld(object):
         self._drone = None
         self._blocks = []
 
-        # Goal position for the drone
-        self._goal_position = None
-
     def add_drone(self, x, y, z):
         """Add a drone to the world.
         """
@@ -60,6 +57,8 @@ class DroneWorld(object):
             self.add_block(x, y, z, obj_id)
 
     def verify_world_bounds(self, x, y, z):
+        """Verify that the (x, y, z) location is within the defined drone world.
+        """
         if x < self.x_min or x > self.x_max:
             return False
         if y < self.y_min or y > self.y_max:
@@ -67,19 +66,6 @@ class DroneWorld(object):
         if z < self.z_min or z > self.z_max:
             return False
         return True
-
-    def set_goal(self, x, y, z):
-        """Set the goal for the drone.
-        """
-        if not self.verify_world_bounds(x, y, z):
-            raise ValueError("Position outside of the drone world: ({}, {}, {})".format(x, y, z))
-        self._goal_position = (x, y, z)
-
-    def is_goal_set(self):
-        return self._goal_position is not None
-
-    def is_goal_met(self):
-        return self._goal_position == self._drone.location()
 
     def get_object(self, x, y, z):
         """Get object from world based on (x, y, z) location.
@@ -106,20 +92,10 @@ class DroneWorld(object):
                 return False
         return True
 
-    def is_block_covered(self, x, y, z):
-        """Given the (x, y, z) location of a block, check if block exists above this location.
+    def get_drone_location(self):
+        """Get the current drone (x, y, z) location.
         """
-        check_location = (x, y + 1, z)
-        for block in self._blocks:
-            if check_location == block.location():
-                return True
-        return False
-
-    def attach_goal_location(self, x, y, z):
-        """Given a location (x, y, z), return an attached drone location.
-        The given location should be the block the drone should attach to.
-        """
-        return x, y + 1, z
+        return self._drone.x, self._drone.y, self._drone.z
 
     def attach(self):
         """Attach a block to the drone.
@@ -153,32 +129,15 @@ class DroneWorld(object):
     def initialize(self, filename):
         """Initialize the drone world from a file.
         """
-        with open(filename, "rb") as csvfile:
-            reader = csv.reader(csvfile, delimiter=",")
+        with open(filename, "rb") as csv_file:
+            reader = csv.reader(csv_file, delimiter=",")
             for row in reader:
                 self.add_object(int(row[0]), int(row[1]), int(row[2]), row[3])
-
-    def apply_action(self, action):
-        """Apply an action to the drone.
-         This translate a tuple to a move operation.
-        """
-        x, y, z = action
-        self.move(x, y, z)
 
     def actions(self):
         """Get all the actions for the drone.
         """
         return self._drone.actions()
-
-    def h(self):
-        # Calculate distance between goal position and drone position
-        x1, y1, z1 = self._drone.location()
-        x2, y2, z2 = self._goal_position
-
-        dist = math.pow((x1 - x2), 2)
-        dist += math.pow((y1 - y2), 2)
-        dist += math.pow((z1 - z2), 2)
-        return math.sqrt(dist)
 
     def __eq__(self, other):
         return self._drone == other._drone and self._blocks == other._blocks

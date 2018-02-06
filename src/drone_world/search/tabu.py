@@ -1,9 +1,9 @@
-from cost_node import CostNode
+from node import Node
 
 class TabuSearch(object):
     def __init__(self, init_node, short_mem_limit):
-        if not isinstance(init_node, CostNode):
-            raise ValueError("init_node must be a CostNode object")
+        if not isinstance(init_node, Node):
+            raise ValueError("init_node must be a Node object")
         self.s_best = init_node
         self.short_mem_limit = short_mem_limit
 
@@ -21,7 +21,7 @@ class TabuSearch(object):
         # Add init_node to tabu structures
         tabu_short_term_mem.append(best_candidate)
 
-        # Loop through until s_best (which is a CostNode) is successful
+        # Loop through until s_best (which is a Node) is successful
         while not self.s_best.is_goal_met():
 
             # Get all the neighbors
