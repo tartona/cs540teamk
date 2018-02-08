@@ -1,10 +1,10 @@
 import re
 
 class DroneWorldObjectId(object):
-    DRONE = 0
-    RED = 1
-    GREEN = 2
-    BLUE = 4
+    DRONE = 1
+    RED = 2
+    GREEN = 4
+    BLUE = 8
 
     @staticmethod
     def str_to_id(string):
@@ -18,6 +18,19 @@ class DroneWorldObjectId(object):
             return DroneWorldObjectId.DRONE
         else:
             raise ValueError("Unsupported drone world object type: {}".format(string))
+
+    @staticmethod
+    def id_to_str(obj_id):
+        if obj_id == DroneWorldObjectId.DRONE:
+            return "cyan"
+        elif obj_id == DroneWorldObjectId.RED:
+            return "red"
+        elif obj_id == DroneWorldObjectId.GREEN:
+            return "green"
+        elif obj_id == DroneWorldObjectId.BLUE:
+            return "blue"
+        else:
+            raise ValueError("Unsupported drone world object type: {}".format(obj_id))
 
 class DroneWorldObject(object):
     def __init__(self, world, x, y, z, object_id):

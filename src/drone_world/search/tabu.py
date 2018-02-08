@@ -6,6 +6,7 @@ class TabuSearch(object):
             raise ValueError("init_node must be a Node object")
         self.s_best = init_node
         self.short_mem_limit = short_mem_limit
+        self.iterations = 0
 
     def run(self):
         """Run a Tabu search.
@@ -23,6 +24,9 @@ class TabuSearch(object):
 
         # Loop through until s_best (which is a Node) is successful
         while not self.s_best.is_goal_met():
+
+            # Up the iteration counters
+            self.iterations += 1
 
             # Get all the neighbors
             neighbors = best_candidate.expand()

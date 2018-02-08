@@ -1,5 +1,4 @@
 import csv
-import math
 from drone_world_object import DroneWorldObjectId
 from drone import Drone
 from block import Block

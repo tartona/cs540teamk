@@ -1,7 +1,176 @@
 import math
 import copy
+import time
 from drone_world import DroneWorld
+from drone_world_object import DroneWorldObjectId
 from search.node import Node
+from search.tabu import TabuSearch
+from search.simulated_annealing import SimulatedAnnealingSearch
+
+class TowerPlannerSimulateAnnealing(object):
+    def __init__(self, x, y, z, world):
+        """Construct a tower at the given (x, y, z) location.
+        """
+        if not isinstance(world, DroneWorld):
+            raise TypeError("World object must be of type DroneWorld")
+        self.goal_x = x
+        self.goal_y = y
+        self.goal_z = z
+        self.height = 0
+        self.world = world
+        self.start_time = None
+        self.end_time = None
+        self.moves = 0
+
+    @property
+    def runtime(self):
+        return self.end_time - self.start_time
+
+    def generate_attach_goal(self):
+        states = self.world.state()
+        for state in states:
+            obj_id, x, y, z = state
+            if obj_id == DroneWorldObjectId.DRONE or x == self.goal_x and z == self.goal_z:
+                continue
+            else:
+                if not self.world.verify_world_bounds(x, y + 1, z):
+                    raise RuntimeError("Goal position cannot be achieved")
+                return x, y + 1, z
+
+    def generate_release_goal(self):
+        if not self.world.verify_world_bounds(self.goal_x, self.height + 2, self.goal_z):
+            raise RuntimeError("Goal position cannot be achieved")
+        return self.goal_x, self.height + 1, self.goal_z
+
+    def run(self):
+        self.start_time = time.time()
+        while self.height != self.goal_y:
+
+            # Generate an attach goal
+            x, y, z = self.generate_attach_goal()
+            attach_goal_node = DroneWorldGoal.generate_search_node(x, y, z, self.world)
+
+            # Run simulate annealing search
+            simulate_annealing = SimulatedAnnealingSearch(attach_goal_node, 1000.0, 0.01)
+            solution = simulate_annealing.run()
+
+            # Update drone world with results
+            actions = solution.get_actions()
+            for action in actions:
+                x, y, z = action
+                self.world.move(x, y, z)
+            self.moves += len(actions)
+
+            # Attach to the block
+            self.world.attach()
+
+            # Generate goal to release the block
+            x, y, z = self.generate_release_goal()
+            release_goal_node = DroneWorldGoal.generate_search_node(x, y, z, self.world)
+
+            # Run Tabu search
+            simulate_annealing = SimulatedAnnealingSearch(release_goal_node, 1000.0, 0.01)
+            solution = simulate_annealing.run()
+
+            # Update drone world with results
+            actions = solution.get_actions()
+            for action in actions:
+                x, y, z = action
+                self.world.move(x, y, z)
+            self.moves += len(actions)
+
+            # Release the block
+            self.world.release()
+
+            # Increment stack height
+            self.height += 1
+
+        # Exit
+        self.end_time = time.time()
+        return
+
+class TowerPlannerTabu(object):
+    def __init__(self, x, y, z, world):
+        """Construct a tower at the given (x, y, z) location.
+        """
+        if not isinstance(world, DroneWorld):
+            raise TypeError("World object must be of type DroneWorld")
+        self.goal_x = x
+        self.goal_y = y
+        self.goal_z = z
+        self.height = 0
+        self.world = world
+        self.start_time = None
+        self.end_time = None
+        self.moves = 0
+
+    @property
+    def runtime(self):
+        return self.end_time - self.start_time
+
+    def generate_attach_goal(self):
+        states = self.world.state()
+        for state in states:
+            obj_id, x, y, z = state
+            if obj_id == DroneWorldObjectId.DRONE or x == self.goal_x and z == self.goal_z:
+                continue
+            else:
+                if not self.world.verify_world_bounds(x, y + 1, z):
+                    raise RuntimeError("Goal position cannot be achieved")
+                return x, y + 1, z
+
+    def generate_release_goal(self):
+        if not self.world.verify_world_bounds(self.goal_x, self.height + 2, self.goal_z):
+            raise RuntimeError("Goal position cannot be achieved")
+        return self.goal_x, self.height + 1, self.goal_z
+
+    def run(self):
+        self.start_time = time.time()
+        while self.height != self.goal_y:
+
+            # Generate an attach goal
+            x, y, z = self.generate_attach_goal()
+            attach_goal_node = DroneWorldGoal.generate_search_node(x, y, z, self.world)
+
+            # Run Tabu search
+            tabu = TabuSearch(attach_goal_node, 5)
+            solution = tabu.run()
+
+            # Update drone world with results
+            actions = solution.get_actions()
+            for action in actions:
+                x, y, z = action
+                self.world.move(x, y, z)
+            self.moves += len(actions)
+
+            # Attach to the block
+            self.world.attach()
+
+            # Generate goal to release the block
+            x, y, z = self.generate_release_goal()
+            release_goal_node = DroneWorldGoal.generate_search_node(x, y, z, self.world)
+
+            # Run Tabu search
+            tabu = TabuSearch(release_goal_node, 5)
+            solution = tabu.run()
+
+            # Update drone world with results
+            actions = solution.get_actions()
+            for action in actions:
+                x, y, z = action
+                self.world.move(x, y, z)
+            self.moves += len(actions)
+
+            # Release the block
+            self.world.release()
+
+            # Increment stack height
+            self.height += 1
+
+        # Exit
+        self.end_time = time.time()
+        return
+
 
 class DroneWorldGoal(object):
     @staticmethod
