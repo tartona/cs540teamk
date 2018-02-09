@@ -5,7 +5,7 @@ from drone_world.drone_world_goal import TowerPlannerSimulateAnnealing
 if __name__ == "__main__":
     # Initialize the world
     world = DroneWorld()
-    world.initialize("worlds/50_red.csv")
+    world.initialize("worlds/10_walls_10_red_10_blue_15_green_15_yellow.csv")
 
     # Display start world
     DroneWorldFigure(world).show()

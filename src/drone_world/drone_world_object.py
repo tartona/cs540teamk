@@ -5,6 +5,8 @@ class DroneWorldObjectId(object):
     RED = 2
     GREEN = 4
     BLUE = 8
+    BLACK = 16
+    YELLOW = 32
 
     @staticmethod
     def str_to_id(string):
@@ -16,6 +18,10 @@ class DroneWorldObjectId(object):
             return DroneWorldObjectId.BLUE
         elif re.search("drone", string, re.IGNORECASE):
             return DroneWorldObjectId.DRONE
+        elif re.search("black", string, re.IGNORECASE):
+            return DroneWorldObjectId.BLACK
+        elif re.search("yellow", string, re.IGNORECASE):
+            return DroneWorldObjectId.YELLOW
         else:
             raise ValueError("Unsupported drone world object type: {}".format(string))
 
@@ -29,6 +35,10 @@ class DroneWorldObjectId(object):
             return "green"
         elif obj_id == DroneWorldObjectId.BLUE:
             return "blue"
+        elif obj_id == DroneWorldObjectId.BLACK:
+            return "black"
+        elif obj_id == DroneWorldObjectId.YELLOW:
+            return "yellow"
         else:
             raise ValueError("Unsupported drone world object type: {}".format(obj_id))
 
