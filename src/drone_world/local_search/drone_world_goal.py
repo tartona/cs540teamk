@@ -1,11 +1,12 @@
-import math
 import copy
+import math
 import time
-from drone_world import DroneWorld
-from drone_world_object import DroneWorldObjectId
-from search.node import Node
-from search.tabu import TabuSearch
-from search.simulated_annealing import SimulatedAnnealingSearch
+
+from ..drone_world import DroneWorld
+from ..local_search.node import Node
+from ..local_search.simulated_annealing import SimulatedAnnealingSearch
+from ..local_search.tabu import TabuSearch
+from ..object.drone_world_object import DroneWorldObjectId
 
 class TowerPlannerSimulateAnnealing(object):
     def __init__(self, x, y, z, world):
@@ -50,7 +51,7 @@ class TowerPlannerSimulateAnnealing(object):
             x, y, z = self.generate_attach_goal()
             attach_goal_node = DroneWorldGoal.generate_search_node(x, y, z, self.world)
 
-            # Run simulate annealing search
+            # Run simulate annealing local_search
             simulate_annealing = SimulatedAnnealingSearch(attach_goal_node, 1000.0, 0.01)
             solution = simulate_annealing.run()
 
@@ -68,7 +69,7 @@ class TowerPlannerSimulateAnnealing(object):
             x, y, z = self.generate_release_goal()
             release_goal_node = DroneWorldGoal.generate_search_node(x, y, z, self.world)
 
-            # Run Tabu search
+            # Run Tabu local_search
             simulate_annealing = SimulatedAnnealingSearch(release_goal_node, 1000.0, 0.01)
             solution = simulate_annealing.run()
 
@@ -132,7 +133,7 @@ class TowerPlannerTabu(object):
             x, y, z = self.generate_attach_goal()
             attach_goal_node = DroneWorldGoal.generate_search_node(x, y, z, self.world)
 
-            # Run Tabu search
+            # Run Tabu local_search
             tabu = TabuSearch(attach_goal_node, 5)
             solution = tabu.run()
 
@@ -150,7 +151,7 @@ class TowerPlannerTabu(object):
             x, y, z = self.generate_release_goal()
             release_goal_node = DroneWorldGoal.generate_search_node(x, y, z, self.world)
 
-            # Run Tabu search
+            # Run Tabu local_search
             tabu = TabuSearch(release_goal_node, 5)
             solution = tabu.run()
 

@@ -14,6 +14,8 @@ class Drone(DroneWorldObject):
         world_object = self._world.get_object(self.x, self.y - 1, self.z)
         if isinstance(world_object, Block):
             self._attached_block = world_object
+        else:
+            raise RuntimeError("No block to attach to")
 
     def release(self):
         """Release an attached Block.

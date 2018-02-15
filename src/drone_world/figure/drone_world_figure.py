@@ -1,8 +1,43 @@
-from drone_world import DroneWorld
-from drone_world_object import DroneWorldObjectId
+import numpy as np
 from matplotlib import pyplot as plt
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
-import numpy as np
+from ..drone_world import DroneWorld
+from ..object.drone_world_object import DroneWorldObjectId
+
+class DroneWorldFigureLite(object):
+    def __init__(self, world):
+        if not isinstance(world, DroneWorld):
+            raise TypeError("World must be a DroneWorld object")
+        self.world = world
+        self.fig = plt.figure()
+        self.ax = self.fig.add_subplot(111, projection='3d')
+        self.ax.set_xlabel("X")
+        self.ax.set_ylabel("Z")
+        self.ax.set_zlabel("Y")
+        self.ax.set_ylim(bottom=world.z_min, top=world.z_max)
+        self.ax.set_zlim(bottom=world.y_min, top=world.y_max)
+        self.ax.set_xlim(left=world.x_min, right=world.x_max)
+        self._draw_blocks()
+
+    def _draw_blocks(self):
+        for state in self.world.state():
+            obj_id, x, y, z = state
+            color = DroneWorldObjectId.id_to_str(obj_id)
+
+            # Need to swap y and z values
+            tmp = y
+            y = z
+            z = tmp
+
+            # vertices of a cube
+            v = np.array(
+                [[x, y, z]]
+            )
+            self.ax.scatter3D(v[:, 0], v[:, 1], v[:, 2], c=color)
+        return
+
+    def show(self):
+        plt.show()
 
 class DroneWorldFigure(object):
     def __init__(self, world):
@@ -12,8 +47,11 @@ class DroneWorldFigure(object):
         self.fig = plt.figure()
         self.ax = self.fig.add_subplot(111, projection='3d')
         self.ax.set_xlabel("X")
-        self.ax.set_ylabel("Y")
-        self.ax.set_zlabel("Z")
+        self.ax.set_ylabel("Z")
+        self.ax.set_zlabel("Y")
+        self.ax.set_ylim(bottom=world.z_min, top=world.z_max)
+        self.ax.set_zlim(bottom=world.y_min, top=world.y_max)
+        self.ax.set_xlim(left=world.x_min, right=world.x_max)
         self._draw_blocks()
 
     def _draw_blocks(self):
@@ -37,7 +75,7 @@ class DroneWorldFigure(object):
                  [x + 1, y + 1, z],
                  [x + 1, y + 1, z + 1]]
             )
-            self.ax.scatter3D(v[:, 0], v[:, 1], v[:, 2])
+            self.ax.scatter3D(v[:, 0], v[:, 1], v[:, 2], c=color)
 
             # generate list of sides' polygons of our pyramid
             verts = [

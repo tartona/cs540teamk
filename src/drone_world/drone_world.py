@@ -1,7 +1,7 @@
 import csv
-from drone_world_object import DroneWorldObjectId
-from drone import Drone
-from block import Block
+from object.block import Block
+from object.drone_world_object import DroneWorldObjectId
+from object.drone import Drone
 
 class DroneWorld(object):
     def __init__(self, x_min=-50, x_max=50, y_min=0, y_max=50, z_min=-50, z_max=50):
@@ -109,7 +109,7 @@ class DroneWorld(object):
     def move(self, dx, dy, dz):
         """Move the drone in the drone world.
         """
-        self._drone.move(dx, dy, dz)
+        return self._drone.move(dx, dy, dz)
 
     def speak(self, msg):
         """Not implemented.

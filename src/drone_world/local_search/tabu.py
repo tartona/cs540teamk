@@ -9,8 +9,8 @@ class TabuSearch(object):
         self.iterations = 0
 
     def run(self):
-        """Run a Tabu search.
-         Note that this Tabu search is based on lower cost meaning a lower value is better.
+        """Run a Tabu local_search.
+         Note that this Tabu local_search is based on lower cost meaning a lower value is better.
         """
 
         # Set best candidate to the init_node
