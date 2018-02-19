@@ -136,7 +136,7 @@ class CrowSearch(object):
                         if replace_n == 0:
                             replace_n = 1
                         # since the crow travels further than the target crow's memory,
-                        # modifying the target crow's memory instead of the current crow's position
+                        # start from the target crow's memory instead of the current crow's position
                         self.Pos[crow] = copy.deepcopy(target_crow)
                         indexes = random.sample(range(0, len(self.goal)), replace_n)
                         # replace the element in the current crow's position to the random element
