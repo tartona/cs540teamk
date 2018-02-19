@@ -10,7 +10,7 @@ class CrowSearch(object):
         self.s_best = None
         self.maxiter = 50
         self.NC = 100 # number of crows
-        self.FL = 1.3 # flight length it cannot be used here
+        self.FL = 1.3 # flight length  
         self.AP = 0.4 # awareness probability
         self.Mem = [] # memory for food position
         self.Pos = [] # current position of crows
@@ -160,11 +160,6 @@ class CrowSearch(object):
                                     done = True
                                 else:
                                     continue
-
-                            # ensure no duplicates
-                            if target_crow[j] not in self.Pos[crow]:
-                                #if target_crow[j] == self.Pos[crow][j]: print("Error")
-                                self.Pos[crow][j] = target_crow[j]
 
                 # if a random number is lesser than the awareness probability
                 else:
