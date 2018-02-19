@@ -81,18 +81,43 @@ class DroneWorldObject(object):
         (dx, dy, dz) for the object.
         """
         valid_actions = []
-        if self._world.can_move_object(self.x + 1, self.y, self.z):
-            valid_actions.append((1, 0, 0))
-        if self._world.can_move_object(self.x - 1, self.y, self.z):
-            valid_actions.append((-1, 0, 0))
-        if self._world.can_move_object(self.x, self.y + 1, self.z):
-            valid_actions.append((0, 1, 0))
-        if self._world.can_move_object(self.x, self.y - 1, self.z):
-            valid_actions.append((0, -1, 0))
-        if self._world.can_move_object(self.x, self.y, self.z + 1):
-            valid_actions.append((0, 0, 1))
-        if self._world.can_move_object(self.x, self.y, self.z - 1):
-            valid_actions.append((0, 0, -1))
+
+        # Evaluate all moves in the positive x direction
+        x = self.x + 1
+        while self._world.can_move_object(x, self.y, self.z):
+            valid_actions.append((x - self.x, 0, 0))
+            x += 1
+
+        # Evaluate all moves in the negative x direction
+        x = self.x - 1
+        while self._world.can_move_object(x, self.y, self.z):
+            valid_actions.append((x - self.x, 0, 0))
+            x -= 1
+
+        # Evaluate all moves in the positive y direction
+        y = self.y + 1
+        while self._world.can_move_object(self.x, y, self.z):
+            valid_actions.append((0, y - self.y, 0))
+            y += 1
+
+        # Evaluate all moves in the negative y direction
+        y = self.y - 1
+        while self._world.can_move_object(self.x, y, self.z):
+            valid_actions.append((0, y - self.y, 0))
+            y -= 1
+
+        # Evaluate all moves in the positive y direction
+        z = self.z + 1
+        while self._world.can_move_object(self.x, self.y, z):
+            valid_actions.append((0, 0, z - self.z))
+            z += 1
+
+        # Evaluate all moves in the positive y direction
+        z = self.z - 1
+        while self._world.can_move_object(self.x, self.y, z):
+            valid_actions.append((0, 0, z - self.z))
+            z -= 1
+
         return valid_actions
 
     def __eq__(self, other):
