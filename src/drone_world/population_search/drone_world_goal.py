@@ -134,7 +134,7 @@ class TowerPlannerCrow(object):
             else:
                 self.blocks.append(state)
 
-    def _generate_goal(self):
+    def _generate_random_goal(self):
         if not len(self.blocks) >= self.height:
             raise RuntimeError("not enought blocks in the world")
         goal_blocks = random.sample(self.blocks, self.height)
@@ -145,7 +145,7 @@ class TowerPlannerCrow(object):
         self.start_time = time.time()
 
         self._initialize_planner()
-        goal = self._generate_goal() # randomly generated goal
+        goal = self._generate_random_goal() # randomly generated goal
 
         search = CrowSearch(self.drone_pos, self.blocks, goal)
         fitness, solution = search.run()
