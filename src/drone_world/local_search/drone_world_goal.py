@@ -2,11 +2,11 @@ import copy
 import math
 import time
 
-from ..drone_world import DroneWorld
-from ..local_search.node import Node
-from ..local_search.simulated_annealing import SimulatedAnnealingSearch
-from ..local_search.tabu import TabuSearch
-from ..object.drone_world_object import DroneWorldObjectId
+from drone_world.drone_world import DroneWorld
+from drone_world.local_search.node import Node
+from drone_world.local_search.simulated_annealing import SimulatedAnnealingSearch
+from drone_world.local_search.tabu import TabuSearch
+from drone_world.object.drone_world_object import DroneWorldObjectId
 
 class TowerPlannerSimulateAnnealing(object):
     def __init__(self, x, y, z, world):

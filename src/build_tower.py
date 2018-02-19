@@ -15,8 +15,8 @@ if __name__ == "__main__":
     tower.run()
 
     # Display stats
-    print "Number of moves: {}".format(tower.moves)
-    print "Runtime: {}".format(tower.runtime)
+    print ("Number of moves: {}".format(tower.moves))
+    print ("Runtime: {}".format(tower.runtime))
 
     # Display end world
     DroneWorldFigure(world).show()

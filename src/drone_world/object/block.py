@@ -1,4 +1,4 @@
-from drone_world_object import DroneWorldObject
+from drone_world.object.drone_world_object import DroneWorldObject
 
 class Block(DroneWorldObject):
     def __init__(self, world, x, y, z, object_id):

@@ -1,7 +1,7 @@
 import csv
-from object.block import Block
-from object.drone_world_object import DroneWorldObjectId
-from object.drone import Drone
+from drone_world.object.block import Block
+from drone_world.object.drone_world_object import DroneWorldObjectId
+from drone_world.object.drone import Drone
 
 class DroneWorld(object):
     def __init__(self, x_min=-50, x_max=50, y_min=0, y_max=50, z_min=-50, z_max=50):
@@ -128,7 +128,7 @@ class DroneWorld(object):
     def initialize(self, filename):
         """Initialize the drone world from a file.
         """
-        with open(filename, "rb") as csv_file:
+        with open(filename, "rt") as csv_file:
             reader = csv.reader(csv_file, delimiter=",")
             for row in reader:
                 self.add_object(int(row[0]), int(row[1]), int(row[2]), row[3])

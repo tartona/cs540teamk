@@ -1,4 +1,4 @@
-from node import Node
+from drone_world.local_search.node import Node
 
 class TabuSearch(object):
     def __init__(self, init_node, short_mem_limit):

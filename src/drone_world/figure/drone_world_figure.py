@@ -1,8 +1,8 @@
 import numpy as np
 from matplotlib import pyplot as plt
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
-from ..drone_world import DroneWorld
-from ..object.drone_world_object import DroneWorldObjectId
+from drone_world.drone_world import DroneWorld
+from drone_world.object.drone_world_object import DroneWorldObjectId
 
 class DroneWorldFigureLite(object):
     def __init__(self, world):
