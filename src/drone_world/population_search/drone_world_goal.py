@@ -13,7 +13,7 @@ class TowerPlannerCrow(object):
         """
         if not isinstance(world, DroneWorld):
             raise TypeError("World object must be of type DroneWorld")
-        self.height = height
+        self.height = height # height of the goal tower
         self.world = world
         self.start_time = None
         self.end_time = None
@@ -43,7 +43,7 @@ class TowerPlannerCrow(object):
     def run(self):
         # Enter
         self.start_time = time.time()
-        
+
         self.initialize_planner()
         goal = self.generate_goal()
 
