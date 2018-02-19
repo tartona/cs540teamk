@@ -1,6 +1,7 @@
 from drone_world.figure.drone_world_figure import DroneWorldFigure
 from drone_world.drone_world import DroneWorld
 from drone_world.population_search.drone_world_goal import TowerPlannerCrow
+from drone_world.population_search.drone_world_goal import TabuTowerPlannerRunner
 
 if __name__ == "__main__":
     # Initialize the world
@@ -13,13 +14,22 @@ if __name__ == "__main__":
     # DroneWorldFigure(world).show()
 
     # Set the goal position to be the first read block that is not covered
-    print("Running Crow Search...")
-    tower = TowerPlannerCrow(world)
-    fitness, solution = tower.run()
+    print("Running Crow Search for planning the tower")
+    goal_height = 50
+    planner = TowerPlannerCrow(world, goal_height)
+    fitness, solution = planner.run()
+    print("Planning done")
+
+    print("Running Tabu Search for moving blocks")
+    runner = TabuTowerPlannerRunner(solution, world)
+    moves = runner.run()
+    print("Running done")
 
     # Display stats
+    print("Crow Search Planner Runtime: {}".format(planner.runtime))
+    print("Tabu Runner Runtime: {}".format(runner.runtime))
+    print("Total Moves: {}".format(moves))
     print("Total Distance Traveled: {}".format(fitness))
-    print("Runtime: {}".format(tower.runtime))
     #for s in solution:
     #    print(s)
 

@@ -5,7 +5,106 @@ import random
 
 from drone_world.drone_world import DroneWorld
 from drone_world.population_search.crow import CrowSearch
+from drone_world.local_search.tabu import TabuSearch
+from drone_world.local_search.node import Node
 from drone_world.object.drone_world_object import DroneWorldObjectId
+
+class TabuTowerPlannerRunner(object):
+    def __init__(self, planner, drone_world, x=0, z=0, debug=False):
+        # Verify arguments
+        if not isinstance(drone_world, DroneWorld):
+            raise TypeError("World must be a drone world type")
+        if x < drone_world.x_min or x > drone_world.x_max:
+            raise ValueError("X location outside the world")
+        if z < drone_world.z_min or z > drone_world.z_max:
+            raise ValueError("Z location outside the world")
+        if not isinstance(planner, list):
+            raise TypeError("Planner must a list object")
+
+        self._planner = planner
+        self._drone_world = drone_world
+        self._x = x
+        self._z = z
+        self._cur_height = 0
+        self._debug = debug
+        self.moves = 0
+        self.start_time = None
+        self.end_time = None
+    
+    @property
+    def runtime(self):
+        return self.end_time - self.start_time
+
+    def _generate_attach_goal(self, state):
+        """Generate an attach goal.
+        """
+        obj_id, x, y, z = state
+        if obj_id == DroneWorldObjectId.DRONE or x == self._x and z == self._z:
+            raise RuntimeError("Invalid goal position")
+        else:
+            if not self._drone_world.verify_world_bounds(x, y + 1, z):
+                raise RuntimeError("Goal position cannot be achieved")
+            return x, y + 1, z
+
+    def _generate_release_goal(self):
+        """Generate a release goal.
+        """
+        if not self._drone_world.verify_world_bounds(self._x, self._cur_height + 1, self._z):
+            raise RuntimeError(
+                "Goal position cannot be achieved: {}".format((self._x, self._cur_height + 1, self._z)))
+        return self._x, self._cur_height + 1, self._z
+
+    def run(self):
+        self._cur_height = 0
+
+        self.start_time = time.time()
+        for block in self._planner:
+
+            # Generate an attach goal
+            x, y, z = self._generate_attach_goal(block)
+            attach_goal_node = DroneWorldGoal.generate_search_node(x, y, z, self._drone_world)
+
+            # Run Tabu local_search
+            tabu = TabuSearch(attach_goal_node, 100)
+            solution = tabu.run()
+
+            # Update drone world with results
+            actions = solution.get_actions()
+            for action in actions:
+                self.moves += 1
+                x, y, z = action
+                self._drone_world.move(x, y, z)
+
+            # Attach to the block
+            if self._debug:
+                print("Drone attach location: {}".format(self._drone_world.get_drone_location()))
+            self._drone_world.attach()
+
+            # Generate goal to release the block
+            x, y, z = self._generate_release_goal()
+            release_goal_node = DroneWorldGoal.generate_search_node(x, y, z, self._drone_world)
+
+            # Run Tabu local_search
+            tabu = TabuSearch(release_goal_node, 100)
+            solution = tabu.run()
+
+            # Update drone world with results
+            actions = solution.get_actions()
+            for action in actions:
+                self.moves += 1
+                x, y, z = action
+                self._drone_world.move(x, y, z)
+
+            # Release the block
+            if self._debug:
+                print("Drone release location: {}".format(self._drone_world.get_drone_location()))
+            self._drone_world.release()
+
+            # Increment stack height
+            self._cur_height += 1
+
+        self.end_time = time.time()
+        return self.moves
 
 class TowerPlannerCrow(object):
     def __init__(self, world, height=30):
@@ -17,7 +116,6 @@ class TowerPlannerCrow(object):
         self.world = world
         self.start_time = None
         self.end_time = None
-        self.moves = 0
         self.drone_pos = None
         self.blocks = []
 
