@@ -10,7 +10,7 @@ from drone_world.local_search.node import Node
 from drone_world.object.drone_world_object import DroneWorldObjectId
 
 class TabuTowerPlannerRunner(object):
-    def __init__(self, planner, drone_world, x=0, z=0, debug=False):
+    def __init__(self, planner, drone_world, x=0, z=0, debug=True):
         # Verify arguments
         if not isinstance(drone_world, DroneWorld):
             raise TypeError("World must be a drone world type")
@@ -112,6 +112,8 @@ class TowerPlannerCrow(object):
         """
         if not isinstance(world, DroneWorld):
             raise TypeError("World object must be of type DroneWorld")
+        if height > world.y_max-1:
+            raise ValueError("Caannot build the tower with height ", height)
         self.height = height # height of the goal tower
         self.world = world
         self.start_time = None

@@ -49,6 +49,7 @@ class TabuSearch(object):
             # Check to see if values need to be popped of Tabu list
             if len(tabu_short_term_mem) > self.short_mem_limit:
                 tabu_short_term_mem.pop(0)
+            print(self.s_best.fitness)
 
         # Return the best solution
         return self.s_best

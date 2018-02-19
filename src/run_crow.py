@@ -20,17 +20,16 @@ if __name__ == "__main__":
     fitness, solution = planner.run()
     print("Planning done")
     print("Crow Search Planner Runtime: {}".format(planner.runtime))
-
-    print("Running Tabu Search for moving blocks..")
-    runner = TabuTowerPlannerRunner(solution, world)
-    moves = runner.run()
-    print("Running done")
-    print("Tabu Runner Runtime: {}".format(runner.runtime))
-
-    print("Total Moves: {}".format(moves))
-    print("Total Distance Traveled: {}".format(fitness))
+    print("Distance Estimate: {}".format(fitness))
     #for s in solution:
     #    print(s)
+
+    #print("Running Tabu Search for moving blocks..")
+    #runner = TabuTowerPlannerRunner(solution, world)
+    #moves = runner.run()
+    #print("Running done")
+    #print("Tabu Runner Runtime: {}".format(runner.runtime))
+    #print("Total Moves: {}".format(moves))
 
     # Display end world
     # TODO:  Re-enable graphics

@@ -92,7 +92,7 @@ class CrowSearch(object):
 
         # The distance from drone to the first block in the list
         x0, y0, z0 = self.drone_pos
-        obj_id1, x2, y2, z2 = solution[0]
+        obj_id2, x2, y2, z2 = solution[0]
         fitness += self._distance(x2, y2, z2, x0, y0, z0)
 
         # cumulating distances between block pairs
@@ -102,7 +102,7 @@ class CrowSearch(object):
             fitness += self._distance(x0, y0, z0, x1, y1, z1) # block to goal
             fitness += self._distance(x2, y2, z2, x0, y0, z0) # goal to block
 
-        obj_id2, x2, y2, z2 = solution[len(solution)-1]
+        obj_id1, x1, y1, z1 = solution[len(solution)-1]
         fitness += self._distance(x0, y0, z0, x2, y2, z2) # block to goal
         return fitness
 
@@ -123,19 +123,48 @@ class CrowSearch(object):
 
                     if flight_length <= 1.0: # local search
                         replace_n = int(flight_length*len(self.goal))
-                    else: # flight_length > 1.0 > global search
+                        indexes = random.sample(range(0, len(self.goal)), replace_n)
+                        # replace the element in the current crow's position to the corresponding element in the target crow's memory
+                        for j in indexes:
+                            # ensure no duplicates
+                            if target_crow[j] not in self.Pos[crow]:
+                                #if target_crow[j] == self.Pos[crow][j]: print("Error")
+                                self.Pos[crow][j] = target_crow[j]
+
+                    else: # flight_length > 1.0 global search
                         replace_n = int((flight_length-1.0)*len(self.goal))
+                        if replace_n == 0:
+                            replace_n = 1
+                        # since the crow travels further than the target crow's memory,
+                        # modifying the target crow's memory instead of the current crow's position
+                        self.Pos[crow] = copy.deepcopy(target_crow)
+                        indexes = random.sample(range(0, len(self.goal)), replace_n)
+                        # replace the element in the current crow's position to the random element
+                        for j in indexes:
+                            done = False
+                            obj_id, x, y, z = self.Pos[crow][j]
+                            while not done:
+                                tmp_b = None
+                                if obj_id == DroneWorldObjectId.RED:
+                                    tmp_b = random.choice(self.red_blocks)
+                                elif obj_id == DroneWorldObjectId.GREEN:
+                                    tmp_b = random.choice(self.green_blocks)
+                                elif obj_id == DroneWorldObjectId.BLUE:
+                                    tmp_b = random.choice(self.blue_blocks)
+                                elif obj_id == DroneWorldObjectId.YELLOW:
+                                    tmp_b = random.choice(self.yellow_blocks)
+                                else:
+                                    continue
+                                if (tmp_b != None) and (tmp_b not in self.Pos[crow]):
+                                    self.Pos[crow][j] = tmp_b
+                                    done = True
+                                else:
+                                    continue
 
-                    if replace_n == 0:
-                        replace_n = 1
-
-                    # replace some of the element to target crow's memory
-                    indexes = random.sample(range(0, len(self.goal)), replace_n)
-                    for j in indexes:
-                        # ensure no duplicates
-                        if target_crow[j] not in self.Pos[crow]:
-                            #if target_crow[j] == self.Pos[crow][j]: print("Error")
-                            self.Pos[crow][j] = target_crow[j]
+                            # ensure no duplicates
+                            if target_crow[j] not in self.Pos[crow]:
+                                #if target_crow[j] == self.Pos[crow][j]: print("Error")
+                                self.Pos[crow][j] = target_crow[j]
 
                 # if a random number is lesser than the awareness probability
                 else:
