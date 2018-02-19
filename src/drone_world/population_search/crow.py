@@ -134,7 +134,7 @@ class CrowSearch(object):
                     for j in indexes:
                         # ensure no duplicates
                         if target_crow[j] not in self.Pos[crow]:
-                            if target_crow[j] == self.Pos[crow][j]: print("Error")
+                            #if target_crow[j] == self.Pos[crow][j]: print("Error")
                             self.Pos[crow][j] = target_crow[j]
 
                 # if a random number is lesser than the awareness probability
@@ -149,7 +149,7 @@ class CrowSearch(object):
         # Find the solution with the best fitness
         new_best = random.choice(self.Mem)
         for i in range(0, len(self.Mem)):
-            #print(self.evaluate_fitness(self.Mem[i]))
+            # print(self._evaluate_fitness(self.Mem[i]))
             if self._evaluate_fitness(new_best) > self._evaluate_fitness(self.Mem[i]):
                 new_best = self.Mem[i]
 

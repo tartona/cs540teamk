@@ -14,20 +14,19 @@ if __name__ == "__main__":
     # DroneWorldFigure(world).show()
 
     # Set the goal position to be the first read block that is not covered
-    print("Running Crow Search for planning the tower")
-    goal_height = 50
+    print("Running Crow Search for planning the tower..")
+    goal_height = 40
     planner = TowerPlannerCrow(world, goal_height)
     fitness, solution = planner.run()
     print("Planning done")
+    print("Crow Search Planner Runtime: {}".format(planner.runtime))
 
-    print("Running Tabu Search for moving blocks")
+    print("Running Tabu Search for moving blocks..")
     runner = TabuTowerPlannerRunner(solution, world)
     moves = runner.run()
     print("Running done")
-
-    # Display stats
-    print("Crow Search Planner Runtime: {}".format(planner.runtime))
     print("Tabu Runner Runtime: {}".format(runner.runtime))
+
     print("Total Moves: {}".format(moves))
     print("Total Distance Traveled: {}".format(fitness))
     #for s in solution:
