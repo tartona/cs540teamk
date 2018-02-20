@@ -1,12 +1,96 @@
 import copy
 import math
 import time
-
+import random
+from abc import ABCMeta, abstractmethod
+from genetic_algorithm import GeneticAlgorithm
 from ..drone_world import DroneWorld
 from ..local_search.node import Node
 from ..population_search.cuckoo import CuckooSearch
 from ..object.drone_world_object import DroneWorldObjectId
 
+class TowerPlanner(object):
+    __metaclass__ = ABCMeta
+    
+    def __init__(self, world, height=30):
+        """Construct a tower at the given (x, y, z) location.
+        """
+        if not isinstance(world, DroneWorld):
+            raise TypeError("World object must be of type DroneWorld")
+        if height > world.y_max-1:
+            raise ValueError("Caannot build the tower with height ", height)
+        self.height = height # height of the goal tower
+        self.world = world
+        self.start_time = None
+        self.end_time = None
+        self.drone_pos = None
+        self.blocks = []
+
+    @property
+    def runtime(self):
+        return self.end_time - self.start_time
+
+    def _initialize_planner(self):
+        states = self.world.state()
+        for state in states:
+            obj_id, x, y, z = state
+            if obj_id == DroneWorldObjectId.DRONE:
+                self.drone_pos = x, y, z
+            else:
+                self.blocks.append(state)
+
+    def _generate_random_goal(self):
+        if not len(self.blocks) >= self.height:
+            raise RuntimeError("not enought blocks in the world")
+        goal_blocks = random.sample(self.blocks, self.height)
+        return goal_blocks
+
+    def _generate_static_goal(self):
+        goal_blocks = []
+        random.shuffle(self.blocks)
+        # The pattern is 2 reds, 2 greens, 2 yellows, 2 blues repeating until the height is meet
+        pattern = [DroneWorldObjectId.RED, DroneWorldObjectId.RED, DroneWorldObjectId.GREEN, DroneWorldObjectId.GREEN,
+                   DroneWorldObjectId.YELLOW, DroneWorldObjectId.YELLOW, DroneWorldObjectId.BLUE,
+                   DroneWorldObjectId.BLUE]
+
+        index = 0
+        while len(goal_blocks) != self.height:
+
+            for block in self.blocks:
+                block_id, x, y, z = block
+                if pattern[index] == block_id and block not in goal_blocks:
+                    goal_blocks.append(block)
+                    break
+            else:
+                raise RuntimeError("Failed to find block to match pattern")
+
+            index += 1
+            if index == len(pattern):
+                index = 0
+
+        return goal_blocks
+
+    @abstractmethod
+    def run(self):
+        pass
+
+class TowerPlannerGA(TowerPlanner):
+    def __init__(self, world, height=30):
+        super(TowerPlannerGA, self).__init__(world, height=height)
+
+    def run(self):
+        # Enter
+        self.start_time = time.time()
+
+        self._initialize_planner()
+        goal = self._generate_static_goal() # statically generated goal
+
+        search = GeneticAlgorithm(self.drone_pos, self.blocks, goal)
+        fitness, solution = search.run()
+
+        # Exit
+        self.end_time = time.time()
+        return fitness, solution
 
 class TowerPlannerCuckoo(object):
     def __init__(self, x, y, z, world):
