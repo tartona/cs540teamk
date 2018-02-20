@@ -5,12 +5,15 @@ import random
 
 from drone_world.drone_world import DroneWorld
 from drone_world.population_search.crow import CrowSearch
+from drone_world.population_search.DSC import DiscreteCuckoo
+from drone_world.population_search.cuckoo import CuckooSearch
+from drone_world.population_search.genetic_algorithm import GeneticAlgorithm
 from drone_world.local_search.tabu import TabuSearch
 from drone_world.local_search.node import Node
 from drone_world.object.drone_world_object import DroneWorldObjectId
 
 class TabuTowerPlannerRunner(object):
-    def __init__(self, planner, drone_world, x=0, z=0, debug=True):
+    def __init__(self, planner, drone_world, x=0, z=0, debug=False):
         # Verify arguments
         if not isinstance(drone_world, DroneWorld):
             raise TypeError("World must be a drone world type")
@@ -107,7 +110,7 @@ class TabuTowerPlannerRunner(object):
         return self.moves
 
 class TowerPlannerCrow(object):
-    def __init__(self, world, height=30):
+    def __init__(self, world, height=30, goal=None):
         """Construct a tower at the given (x, y, z) location.
         """
         if not isinstance(world, DroneWorld):
@@ -120,6 +123,7 @@ class TowerPlannerCrow(object):
         self.end_time = None
         self.drone_pos = None
         self.blocks = []
+        self.goal = goal
 
     @property
     def runtime(self):
@@ -145,15 +149,247 @@ class TowerPlannerCrow(object):
         self.start_time = time.time()
 
         self._initialize_planner()
-        goal = self._generate_random_goal() # randomly generated goal
 
-        search = CrowSearch(self.drone_pos, self.blocks, goal)
+        if self.goal is None:
+            self.goal = self._generate_random_goal() # randomly generated goal
+
+        search = CrowSearch(self.drone_pos, self.blocks, self.goal)
         fitness, solution = search.run()
 
         # Exit
         self.end_time = time.time()
         return fitness, solution
 
+class TowerPlannerDCS(object):
+    def __init__(self, world, height=30, goal=None):
+        """Construct a tower at the given (x, y, z) location.
+        """
+        if not isinstance(world, DroneWorld):
+            raise TypeError("World object must be of type DroneWorld")
+        if height > world.y_max-1:
+            raise ValueError("Caannot build the tower with height ", height)
+        self.height = height # height of the goal tower
+        self.world = world
+        self.start_time = None
+        self.end_time = None
+        self.drone_pos = None
+        self.blocks = []
+        self.goal = goal
+
+    @property
+    def runtime(self):
+        return self.end_time - self.start_time
+
+    def _initialize_planner(self):
+        states = self.world.state()
+        for state in states:
+            obj_id, x, y, z = state
+            if obj_id == DroneWorldObjectId.DRONE:
+                self.drone_pos = x, y, z
+            else:
+                self.blocks.append(state)
+
+    def _generate_random_goal(self):
+        if not len(self.blocks) >= self.height:
+            raise RuntimeError("not enought blocks in the world")
+        goal_blocks = random.sample(self.blocks, self.height)
+        return goal_blocks
+
+    def run(self):
+        # Enter
+        self.start_time = time.time()
+
+        self._initialize_planner()
+
+        if self.goal is None:
+            self.goal = self._generate_random_goal() # randomly generated goal
+
+        search = DiscreteCuckoo(self.drone_pos, self.blocks, self.goal)
+        fitness, solution = search.run()
+
+        # Exit
+        self.end_time = time.time()
+        return fitness, solution
+
+class TowerPlannerGA(object):
+    def __init__(self, world, height=30, goal=None):
+        """Construct a tower at the given (x, y, z) location.
+        """
+        if not isinstance(world, DroneWorld):
+            raise TypeError("World object must be of type DroneWorld")
+        if height > world.y_max-1:
+            raise ValueError("Caannot build the tower with height ", height)
+        self.height = height # height of the goal tower
+        self.world = world
+        self.start_time = None
+        self.end_time = None
+        self.drone_pos = None
+        self.blocks = []
+        self.goal = goal
+
+    @property
+    def runtime(self):
+        return self.end_time - self.start_time
+
+    def _initialize_planner(self):
+        states = self.world.state()
+        for state in states:
+            obj_id, x, y, z = state
+            if obj_id == DroneWorldObjectId.DRONE:
+                self.drone_pos = x, y, z
+            else:
+                self.blocks.append(state)
+
+    def _generate_random_goal(self):
+        if not len(self.blocks) >= self.height:
+            raise RuntimeError("not enought blocks in the world")
+        goal_blocks = random.sample(self.blocks, self.height)
+        return goal_blocks
+
+    def run(self):
+        # Enter
+        self.start_time = time.time()
+
+        self._initialize_planner()
+
+        if self.goal is None:
+            self.goal = self._generate_random_goal() # randomly generated goal
+
+        search = GeneticAlgorithm(self.drone_pos, self.blocks, self.goal)
+        fitness, solution = search.run()
+
+        # Exit
+        self.end_time = time.time()
+        return fitness, solution
+
+
+class TowerPlannerCuckoo(object):
+    def __init__(self, world, height=30, goal=None):
+        """Construct a tower at the given (x, y, z) location.
+        """
+        if not isinstance(world, DroneWorld):
+            raise TypeError("World object must be of type DroneWorld")
+        if height > world.y_max-1:
+            raise ValueError("Caannot build the tower with height ", height)
+        self.height = height # height of the goal tower
+        self.world = world
+        self.start_time = None
+        self.end_time = None
+        self.drone_pos = None
+        self.blocks = []
+        self.goal = goal
+
+    @property
+    def runtime(self):
+        return self.end_time - self.start_time
+
+    def _initialize_planner(self):
+        states = self.world.state()
+        for state in states:
+            obj_id, x, y, z = state
+            if obj_id == DroneWorldObjectId.DRONE:
+                self.drone_pos = x, y, z
+            else:
+                self.blocks.append(state)
+
+    def _generate_random_goal(self):
+        if not len(self.blocks) >= self.height:
+            raise RuntimeError("not enought blocks in the world")
+        goal_blocks = random.sample(self.blocks, self.height)
+        return goal_blocks
+
+    def run(self):
+        # Enter
+        self.start_time = time.time()
+
+        self._initialize_planner()
+
+        if self.goal is None:
+            self.goal = self._generate_random_goal() # randomly generated goal
+
+        search = CuckooSearch(self.drone_pos, self.blocks, self.goal)
+        fitness, solution = search.run()
+        #fitness, solution = (0,0)
+        # Exit
+        self.end_time = time.time()
+        return fitness, solution
+
+class TowerPlanner(object):
+    def __init__(self, world, height=30, goal=None):
+        """Construct a tower at the given (x, y, z) location.
+        """
+        if not isinstance(world, DroneWorld):
+            raise TypeError("World object must be of type DroneWorld")
+        if height > world.y_max-1:
+            raise ValueError("Caannot build the tower with height ", height)
+        self.height = height # height of the goal tower
+        self.world = world
+        self.start_time = None
+        self.end_time = None
+        self.drone_pos = None
+        self.blocks = []
+        self.goal = goal
+
+    @property
+    def runtime(self):
+        return self.end_time - self.start_time
+
+    def _initialize_planner(self):
+        states = self.world.state()
+        for state in states:
+            obj_id, x, y, z = state
+            if obj_id == DroneWorldObjectId.DRONE:
+                self.drone_pos = x, y, z
+            else:
+                self.blocks.append(state)
+
+    def _generate_random_goal(self):
+        if not len(self.blocks) >= self.height:
+            raise RuntimeError("not enought blocks in the world")
+        goal_blocks = random.sample(self.blocks, self.height)
+        return goal_blocks
+
+    def run(self):
+        self.start_time = time.time()
+
+        result = []
+
+        self._initialize_planner()
+
+        if self.goal is None:
+            self.goal = self._generate_random_goal() # randomly generated goal
+
+        start_time = time.time()
+        search = CrowSearch(self.drone_pos, self.blocks, self.goal)
+        fitness, solution = search.run()
+        end_time = time.time()
+        runtime = end_time - start_time
+        result.append((fitness, solution, runtime))
+
+        start_time = time.time()
+        search = DiscreteCuckoo(self.drone_pos, self.blocks, self.goal)
+        fitness, solution = search.run()
+        end_time = time.time()
+        runtime = end_time - start_time
+        result.append((fitness, solution, runtime))
+
+        start_time = time.time()
+        search = GeneticAlgorithm(self.drone_pos, self.blocks, self.goal)
+        fitness, solution = search.run()
+        end_time = time.time()
+        runtime = end_time - start_time
+        result.append((fitness, solution, runtime))
+
+        start_time = time.time()
+        search = CuckooSearch(self.drone_pos, self.blocks, self.goal)
+        fitness, solution = search.run()
+        end_time = time.time()
+        runtime = end_time - start_time
+        result.append((fitness, solution.solution, runtime))
+
+        self.end_time = time.time()
+
+        return result
 
 class DroneWorldGoal(object):
     @staticmethod

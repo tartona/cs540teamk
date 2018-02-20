@@ -4,8 +4,9 @@ import copy
 import datetime
 from drone_world.object.block import Block
 from drone_world.object.drone_world_object import DroneWorldObjectId
+from drone_world.population_search.population_algorithm import PopulationAlgorithm
 
-class CrowSearch(object):
+class CrowSearch(PopulationAlgorithm):
     def __init__(self, drone_pos, blocks, goal):
         self.s_best = None
         self.maxiter = 50
@@ -14,63 +15,8 @@ class CrowSearch(object):
         self.AP = 0.4 # awareness probability
         self.Mem = [] # memory for food position
         self.Pos = [] # current position of crows
-        self.drone_pos = drone_pos
-        self.blocks = blocks
-        self.goal = goal
-        self.red_blocks = []
-        self.green_blocks = []
-        self.blue_blocks = []
-        self.yellow_blocks = []
 
-    # organize blocks into 4 different colors
-    def _organize_blocks(self):
-        for block in self.blocks:
-            obj_id, x, y, z = block
-            if obj_id == DroneWorldObjectId.RED:
-                self.red_blocks.append(block)
-            elif obj_id == DroneWorldObjectId.GREEN:
-                self.green_blocks.append(block)
-            elif obj_id == DroneWorldObjectId.BLUE:
-                self.blue_blocks.append(block)
-            elif obj_id == DroneWorldObjectId.YELLOW:
-                self.yellow_blocks.append(block)
-
-    # create a solution with random blocks
-    def _generate_random_solution(self):
-        solution = []
-        for block in self.goal:
-            found = False
-            obj_id, x, y, z = block
-            while not found:
-                if obj_id == DroneWorldObjectId.RED:
-                    red_b = random.choice(self.red_blocks)
-                    if red_b not in solution:
-                        solution.append(red_b)
-                        found = True
-                    else:
-                        continue
-                elif obj_id == DroneWorldObjectId.GREEN:
-                    green_b = random.choice(self.green_blocks)
-                    if green_b not in solution:
-                        solution.append(green_b)
-                        found = True
-                    else:
-                        continue
-                elif obj_id == DroneWorldObjectId.BLUE:
-                    blue_b = random.choice(self.blue_blocks)
-                    if blue_b not in solution:
-                        solution.append(blue_b)
-                        found = True
-                    else:
-                        continue
-                elif obj_id == DroneWorldObjectId.YELLOW:
-                    yellow_b = random.choice(self.yellow_blocks)
-                    if yellow_b not in solution:
-                        solution.append(yellow_b)
-                        found = True
-                    else:
-                        continue
-        return solution
+        super(CrowSearch, self).__init__(drone_pos, blocks, goal, False)
 
     # randomly assign a crow to the search space
     def _initialize_crows(self):
@@ -79,37 +25,9 @@ class CrowSearch(object):
             self.Mem.append(copy.deepcopy(random_s))
             self.Pos.append(copy.deepcopy(random_s))
 
-    def _distance(self, x1, y1, z1, x2, y2, z2):
-        distance = 0.0
-        distance += math.pow(x1 - x2, 2)
-        distance += math.pow(y1 - y2, 2)
-        distance += math.pow(z1 - z2, 2)
-        return math.sqrt(distance)
-
-    # retrun a fitness value which is the total distance traveled
-    def _evaluate_fitness(self, solution):
-        fitness = 0
-
-        # The distance from drone to the first block in the list
-        x0, y0, z0 = self.drone_pos
-        obj_id2, x2, y2, z2 = solution[0]
-        fitness += self._distance(x2, y2, z2, x0, y0, z0)
-
-        # cumulating distances between block pairs
-        for i in range(0, len(solution)-1):
-            obj_id1, x1, y1, z1 = solution[i]
-            obj_id2, x2, y2, z2 = solution[i+1]
-            fitness += self._distance(x0, y0, z0, x1, y1, z1) # block to goal
-            fitness += self._distance(x2, y2, z2, x0, y0, z0) # goal to block
-
-        obj_id1, x1, y1, z1 = solution[len(solution)-1]
-        fitness += self._distance(x0, y0, z0, x2, y2, z2) # block to goal
-        return fitness
-
     # run crow search
     def run(self):
 
-        self._organize_blocks()
         self._initialize_crows()
 
         for i in range(0, self.maxiter):
