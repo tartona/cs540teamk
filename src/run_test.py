@@ -94,7 +94,7 @@ if __name__ == "__main__":
     print("Result - Runtime")
     print("Algo\tBEST\t\tMEAN\t\tSTD\t\tWORST")
     print("%s\t%0.3f\t\t%0.3f\t\t%0.3f\t\t%0.3f"%("1. CSA", find_best(crow_results, 2), calculate_mean(crow_results, 2), calculate_std(crow_results, 2), find_worst(crow_results, 2)))
-    print("%s\t%0.3f\t\t%0.3f\t\t%0.3f\t\t%0.3f"%("2. DCS", find_best(DCS_results, 2), calculate_mean(DCS_results, 2), calculate_std(DCS_results, 2), find_worst(DCS_results, 2)))
+    print("%s\t%0.3f\t\t%0.3f\t\t%0.3f\t\t%0.3f"%("2. DDCS", find_best(DCS_results, 2), calculate_mean(DCS_results, 2), calculate_std(DCS_results, 2), find_worst(DCS_results, 2)))
     print("%s\t%0.3f\t\t%0.3f\t\t%0.3f\t\t%0.3f"%("3. GA", find_best(GA_results, 2), calculate_mean(GA_results, 2), calculate_std(GA_results, 2), find_worst(GA_results, 2)))
     print("%s\t%0.3f\t\t%0.3f\t\t%0.3f\t\t%0.3f"%("4. MDCS", find_best(cuckoo_results, 2), calculate_mean(cuckoo_results, 2), calculate_std(cuckoo_results, 2), find_worst(cuckoo_results, 2)))
     if run_tabu:
@@ -102,7 +102,7 @@ if __name__ == "__main__":
         print("Result - Moves")
         print("Algo\tBEST\t\tMEAN\t\tSTD\t\tWORST")
         print("%s\t%0.1f\t\t%0.1f\t\t%0.1f\t\t%0.1f"%("1. CSA", np.min(crow_moves), np.mean(crow_moves), np.std(crow_moves), np.max(crow_moves)))
-        print("%s\t%0.1f\t\t%0.1f\t\t%0.1f\t\t%0.1f"%("2. DCS", np.min(DCS_moves), np.mean(DCS_moves), np.std(DCS_moves), np.max(DCS_moves)))
+        print("%s\t%0.1f\t\t%0.1f\t\t%0.1f\t\t%0.1f"%("2. DDCS", np.min(DCS_moves), np.mean(DCS_moves), np.std(DCS_moves), np.max(DCS_moves)))
         print("%s\t%0.1f\t\t%0.1f\t\t%0.1f\t\t%0.1f"%("3. GA", np.min(GA_moves), np.mean(GA_moves), np.std(GA_moves), np.max(GA_moves)))
         print("%s\t%0.1f\t\t%0.1f\t\t%0.1f\t\t%0.1f"%("4. MDCS", np.min(cuckoo_moves), np.mean(cuckoo_moves), np.std(cuckoo_moves), np.max(cuckoo_moves)))
     # Display end world

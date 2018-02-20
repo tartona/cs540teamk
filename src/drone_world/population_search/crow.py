@@ -10,7 +10,7 @@ class CrowSearch(PopulationAlgorithm):
     def __init__(self, drone_pos, blocks, goal):
         self.s_best = None
         self.maxiter = 50
-        self.NC = 100 # number of crows
+        self.NC = 70 # number of crows
         self.FL = 1.3 # flight length  
         self.AP = 0.4 # awareness probability
         self.Mem = [] # memory for food position

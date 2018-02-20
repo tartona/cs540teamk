@@ -9,8 +9,8 @@ from drone_world.population_search.population_algorithm import PopulationAlgorit
 class DiscreteCuckoo(PopulationAlgorithm):
     def __init__(self, drone_pos, blocks, goal):
         self.s_best = None
-        self.maxgen = 50 # number of generation
-        self.population = 100 # number of cuckoos(nests)
+        self.maxgen = 40 # number of generation
+        self.population = 20 # number of cuckoos(nests)
         self.nests = []
         self.pa = int(0.2*self.population) # percentage of nests that will be abandoned
         self.pc = int(0.6*self.population) # percentage of nests used for new eggs

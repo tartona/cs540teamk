@@ -4,7 +4,7 @@ from drone_world.object.drone_world_object import DroneWorldObjectId
 from drone_world.population_search.population_algorithm import PopulationAlgorithm
 
 class GeneticAlgorithm(PopulationAlgorithm):
-    def __init__(self, drone_pos, blocks, goal,  pop_size=10, mutate_prob=0.01, iters=500, debug=False):
+    def __init__(self, drone_pos, blocks, goal,  pop_size=20, mutate_prob=0.01, iters=40, debug=False):
         if pop_size < 2:
             raise ValueError("Initial population cannot be less than 2")
         if pop_size % 2 > 0:
