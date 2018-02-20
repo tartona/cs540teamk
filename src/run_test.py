@@ -4,6 +4,7 @@ from drone_world.population_search.drone_world_goal import TowerPlanner
 from drone_world.population_search.drone_world_goal import TabuTowerPlannerRunner
 import numpy as np
 import copy
+import time
 
 def calculate_mean(list, axis):
     sum = 0
@@ -59,6 +60,7 @@ if __name__ == "__main__":
     cuckoo_moves = []
 
     print("Starting the test..")
+    start_time = time.time()
     for i in range(0, number_of_runs):
         if fixed_goal and i>0:
             goal = crow_results[0][1]
@@ -81,9 +83,10 @@ if __name__ == "__main__":
             runner = TabuTowerPlannerRunner(cuckoo_results[i][1], copy.deepcopy(world))
             moves = runner.run()
             cuckoo_moves.append(moves)
+    end_time = time.time()
     print("Test is done")
-    print("Total Runtime: {}".format(planner.runtime))
-    print("")
+    print("Total Runtime: {}".format(end_time-start_time))
+
     print("Result - Fitness")
     print("Algo\tBEST\t\tMEAN\t\tSTD\t\tWORST")
     print("%s\t%0.1f\t\t%0.1f\t\t%0.1f\t\t%0.1f"%("1. CSA", find_best(crow_results, 0), calculate_mean(crow_results, 0), calculate_std(crow_results, 0), find_worst(crow_results, 0)))
