@@ -42,8 +42,8 @@ class DroneWorld(object):
             raise ValueError("Cannot allocate block at occupied location ({}, {}, {})".format(x, y, z))
         if not self._drone and x == 0 and z == 0:
             raise ValueError("Cannot allocate block at reserved drone location of (0, 0, 0)")
-        elif x == self._drone.x and z == self._drone.z and y > self._drone.y:
-            raise ValueError("Cannot allocate a block above the drone")
+        #elif x == self._drone.x and z == self._drone.z and y > self._drone.y:
+        #    raise ValueError("Cannot allocate a block above the drone")
         self._blocks.append(Block(self, x, y, z, obj_id))
 
     def add_object(self, x, y, z, string):

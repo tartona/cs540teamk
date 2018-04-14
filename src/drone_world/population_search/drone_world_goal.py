@@ -13,7 +13,7 @@ from drone_world.local_search.node import Node
 from drone_world.object.drone_world_object import DroneWorldObjectId
 
 class TabuTowerPlannerRunner(object):
-    def __init__(self, planner, drone_world, x=0, z=0, debug=False):
+    def __init__(self, planner, drone_world, world2=None, x=0, z=0, debug=False):
         # Verify arguments
         if not isinstance(drone_world, DroneWorld):
             raise TypeError("World must be a drone world type")
@@ -33,6 +33,7 @@ class TabuTowerPlannerRunner(object):
         self.moves = 0
         self.start_time = None
         self.end_time = None
+        self.world2 = world2
     
     @property
     def runtime(self):
@@ -77,6 +78,10 @@ class TabuTowerPlannerRunner(object):
                 self.moves += 1
                 x, y, z = action
                 self._drone_world.move(x, y, z)
+                x1, y1, z1 = self._drone_world.get_drone_location()
+                if self.world2 is not None:
+                    if self.world2.can_move_object(x1, y1, z1):
+                        self.world2.add_object(x1, y1, z1, "black")
 
             # Attach to the block
             if self._debug:

@@ -36,13 +36,15 @@ if __name__ == "__main__":
     
     ''' Variables '''
     run_tabu = False # True if you want to run tabu search to move blocks and find the number of moves
-    number_of_runs = 10
+    number_of_runs = 1
     fixed_goal = True # True if you want to run the algorithms for the same goal multiple times
     goal_height = 40 # height of the tower
     
     # Initialize the world
     world = DroneWorld()
     world.initialize("C:/Users/pinkmaggot/Documents/GitHub/cs540teamk/src/worlds/75_red_40_blue_40_green_40_yellow_blocks.csv")
+    #world2 = DroneWorld()
+    #world2.initialize("C:/Users/pinkmaggot/Documents/GitHub/cs540teamk/src/worlds/75_red_40_blue_40_green_40_yellow_blocks.csv")
 
     # Display start world
     # TODO:  Re-enable graphics
@@ -71,18 +73,22 @@ if __name__ == "__main__":
         GA_results.append(result[2])
         cuckoo_results.append(result[3])
         if run_tabu:
-            runner = TabuTowerPlannerRunner(crow_results[i][1], copy.deepcopy(world))
+            runner = TabuTowerPlannerRunner(crow_results[i][1], copy.deepcopy(world), copy.deepcopy(world2))
             moves = runner.run()
             crow_moves.append(moves)
-            runner = TabuTowerPlannerRunner(DCS_results[i][1], copy.deepcopy(world))
+            #DroneWorldFigure(runner.world2).show()
+            runner = TabuTowerPlannerRunner(DCS_results[i][1], copy.deepcopy(world), copy.deepcopy(world2))
             moves = runner.run()
             DCS_moves.append(moves)
-            runner = TabuTowerPlannerRunner(GA_results[i][1], copy.deepcopy(world))
+            #DroneWorldFigure(runner.world2).show()
+            runner = TabuTowerPlannerRunner(GA_results[i][1], copy.deepcopy(world), copy.deepcopy(world2))
             moves = runner.run()
             GA_moves.append(moves)
-            runner = TabuTowerPlannerRunner(cuckoo_results[i][1], copy.deepcopy(world))
+            #DroneWorldFigure(runner.world2).show()
+            runner = TabuTowerPlannerRunner(cuckoo_results[i][1], copy.deepcopy(world), copy.deepcopy(world2))
             moves = runner.run()
             cuckoo_moves.append(moves)
+            #DroneWorldFigure(runner.world2).show()
     end_time = time.time()
     print("Test is done")
     print("Total Runtime: {}".format(end_time-start_time))
