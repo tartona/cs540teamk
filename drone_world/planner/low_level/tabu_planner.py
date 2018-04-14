@@ -57,4 +57,4 @@ class TabuPlanner(object):
         actions = solution.get_actions()
         for action in actions:
             x, y, z = action
-            self.drone_world.move(z, y, z)
+            self.drone_world.move(x, y, z)

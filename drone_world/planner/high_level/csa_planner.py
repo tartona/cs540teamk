@@ -1,6 +1,8 @@
 import csv
 import time
+import re
 from drone_world.drone_world import DroneWorld
+from drone_world.planner.high_level.population_search.crow_search import CrowSearch
 from drone_world.planner.low_level.tabu_planner import TabuPlanner
 
 class CrowSearchPlanner(object):
@@ -44,7 +46,7 @@ class CrowSearchPlanner(object):
             for row in reader:
                 self.raw_objects.append((int(row[0]), int(row[1]), int(row[2]), str(row[3])))
 
-    def parse_objects(self):
+    def _parse_objects(self):
         """Parse the raw objects in goal and dump objects.
 
         A goal object is a block which must be used to complete the objective. A dump objective
@@ -63,8 +65,27 @@ class CrowSearchPlanner(object):
         NOTE: This is where CSA should be implemented.
         """
 
-        # TODO: Must implement this
-        pass
+        # Assume that the goals do not contain a question mark
+        # TODO: Fix the above assumption
+
+        # TODO: Uncover blocks
+        # TODO: Swap incorrect color blocks
+
+        # Separate block from drone goal
+        block_goals = []
+        for item in self.raw_objects:
+            x, y, z, color = item
+            if not re.search("drone", color, re.IGNORECASE):
+                block_goals.append((color, x, y, z))
+
+        # Run crow search
+        csa = CrowSearch(self.drone_world.state(), block_goals)
+        fitness, best = csa.run()
+
+        self.goal_objectives = csa.get_actions()
+
+        return
+
 
     def _run_objective(self, objective):
         """Run a single objective to completion
@@ -100,6 +121,7 @@ class CrowSearchPlanner(object):
         """
 
         start_time = time.time()
+        self._parse_objects()
 
         # Run the dump objectives
         for dump_objective in self.dump_objectives:
