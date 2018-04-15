@@ -2,6 +2,7 @@ import random
 import math
 import copy
 import re
+from drone_world.drone_world import DroneWorld
 from abc import ABCMeta, abstractmethod
 
 class PopulationAlgorithm(object):
@@ -33,6 +34,18 @@ class PopulationAlgorithm(object):
         return sorted_goal
 
     @staticmethod
+    def sort_goal_y_descending(goal):
+        """Sort a goal descending the y-values
+        :param goal: Block vector
+        :return: Sorted block vector
+        """
+
+        # Each entry in goal list is (color, x, y, z) so sort on y value
+        sorted_goal = PopulationAlgorithm.sort_goal_y_ascending(goal)
+        sorted_goal.reverse()
+        return sorted_goal
+
+    @staticmethod
     def fill_goal(goal):
         """Give a goal vector, fill in any missing blocks.
         Blocks cannot be floating.
@@ -61,7 +74,7 @@ class PopulationAlgorithm(object):
 
         return PopulationAlgorithm.sort_goal_y_ascending(filled_goal)
 
-    def __init__(self, blocks, goal, debug=False):
+    def __init__(self, drone_world, blocks, goal, debug=False):
         """Abstract tower planner class.
         NOTE - Covered blocks will not be added into solution.
         NOTE - Tower location will be built at the current x, y, z location of the drone
@@ -69,11 +82,15 @@ class PopulationAlgorithm(object):
         :param goal: List of block colors and location to accomplish the goal.
         :param debug: Extra debug statements.
         """
+        if not isinstance(drone_world, DroneWorld):
+            raise TypeError("drone_world must be of type DroneWorld")
+
         self.s_best = None
         self.raw_blocks = PopulationAlgorithm.filter_out_drone(blocks)
         self.goal = PopulationAlgorithm.fill_goal(goal)
         self.debug = debug
         self.blocks = {}
+        self.drone_world = drone_world
         self._organize_blocks()
 
     def _organize_blocks(self):

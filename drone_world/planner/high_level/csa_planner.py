@@ -4,6 +4,8 @@ import re
 from drone_world.drone_world import DroneWorld
 from drone_world.planner.high_level.population_search.crow_search import CrowSearch
 from drone_world.planner.low_level.tabu_planner import TabuPlanner
+from drone_world.planner.low_level.tabu_planner import LLDumpSubroutine
+from drone_world.planner.low_level.tabu_planner import LLDroneNoop
 
 class CrowSearchPlanner(object):
     """High level planner use crow search algorithm (CSA).
@@ -25,7 +27,6 @@ class CrowSearchPlanner(object):
         self.used_blocks = []
         self.unused_blocks = []
         self.goal_objectives = []
-        self.dump_objectives = []
 
         # Metric counters
         self.runtime = None
@@ -79,13 +80,11 @@ class CrowSearchPlanner(object):
                 block_goals.append((color, x, y, z))
 
         # Run crow search
-        csa = CrowSearch(self.drone_world.state(), block_goals)
+        csa = CrowSearch(self.drone_world, self.drone_world.state(), block_goals)
         fitness, best = csa.run()
 
         self.goal_objectives = csa.get_actions()
-
         return
-
 
     def _run_objective(self, objective):
         """Run a single objective to completion
@@ -93,8 +92,11 @@ class CrowSearchPlanner(object):
         """
         attach_component = objective[0]
         release_component = objective[1]
+
         if not attach_component:
             raise RuntimeError("No attach/move component with the dump objective")
+        if attach_component == release_component:
+            return
 
         # Perform attach component of the objective...
         # Set max_iters to zero... this will cause the tabu search to run forever unless it
@@ -102,7 +104,10 @@ class CrowSearchPlanner(object):
         # Set the Tabu structure to a reasonable size to help navigate obstacles
         x, y, z = int(attach_component[0]), int(attach_component[1]), int(attach_component[2])
         attach_tabu_search = TabuPlanner(x, y, z, self.drone_world, mem_limit=100, max_iters=0)
-        attach_tabu_search.run()
+        try:
+            attach_tabu_search.run()
+        except LLDroneNoop:
+            pass
         if not release_component:
             return
         self.drone_world.attach()
@@ -110,8 +115,12 @@ class CrowSearchPlanner(object):
         # Perform the release component
         x, y, z = int(release_component[0]), int(release_component[1]), int(release_component[2])
         release_tabu_search = TabuPlanner(x, y, z, self.drone_world, mem_limit=100, max_iters=0)
-        release_tabu_search.run()
-        self.drone_world.release()
+        try:
+            release_tabu_search.run()
+        except LLDumpSubroutine:
+            raise
+        finally:
+            self.drone_world.release()
 
     def run(self):
         """Run the entire planner.
@@ -119,17 +128,23 @@ class CrowSearchPlanner(object):
         Running the entire planner consists of executing all the dump and goal objectives.
         All dump objectives should be ran first.
         """
-
         start_time = time.time()
-        self._parse_objects()
-
-        # Run the dump objectives
-        for dump_objective in self.dump_objectives:
-            self._run_objective(dump_objective)
 
         # Run the goal objectives
-        for goal_objective in self.goal_objectives:
-            self._run_objective(goal_objective)
+        success = False
+        while not success:
+            self._parse_objects()
+
+            for goal_objective in self.goal_objectives:
+                try:
+                    self._run_objective(goal_objective)
+                except LLDumpSubroutine:
+                    break
+                except LLDroneNoop:
+                    pass
+            else:
+                # Success is set true if for loop completes (the break call is not hit)
+                success = True
 
         # Goal objective should now be complete
         self.runtime = time.time() - start_time

@@ -94,6 +94,9 @@ class DroneWorld(object):
         """
         return self._drone.x, self._drone.y, self._drone.z
 
+    def is_drone_attached(self):
+        return self._drone.is_attached()
+
     def attach(self):
         """Attach a block to the drone.
         """

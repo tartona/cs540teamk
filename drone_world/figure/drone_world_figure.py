@@ -13,9 +13,9 @@ class DroneWorldFigureLite(object):
         self.ax.set_xlabel("X")
         self.ax.set_ylabel("Z")
         self.ax.set_zlabel("Y")
-        #self.ax.set_ylim(bottom=world.z_min, top=world.z_max)
-        #self.ax.set_zlim(bottom=world.y_min, top=world.y_max)
-        #self.ax.set_xlim(left=world.x_min, right=world.x_max)
+        self.ax.set_xlim(left=world.x_min, right=world.x_max)
+        self.ax.set_ylim(bottom=world.z_min, top=world.z_max)
+        self.ax.set_zlim(bottom=world.y_min, top=world.y_max)
         self._draw_blocks()
 
     def _draw_blocks(self):
@@ -47,9 +47,9 @@ class DroneWorldFigure(object):
         self.ax.set_xlabel("X")
         self.ax.set_ylabel("Z")
         self.ax.set_zlabel("Y")
-        #self.ax.set_ylim(bottom=world.z_min, top=world.z_max)
-        #self.ax.set_zlim(bottom=world.y_min, top=world.y_max)
-        #self.ax.set_xlim(left=world.x_min, right=world.x_max)
+        self.ax.set_xlim(left=world.x_min, right=world.x_max)
+        self.ax.set_ylim(bottom=world.z_min, top=world.z_max)
+        self.ax.set_zlim(bottom=world.y_min, top=world.y_max)
         self._draw_blocks()
 
     def _draw_blocks(self):

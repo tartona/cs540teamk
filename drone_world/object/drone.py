@@ -7,6 +7,9 @@ class Drone(DroneWorldObject):
         self._attached_block = None
         self._moves = 0
 
+    def is_attached(self):
+        return self._attached_block is not None
+
     def attach(self):
         """Search for a Block object directly below drone location.
         """
