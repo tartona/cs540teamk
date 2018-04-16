@@ -1,6 +1,6 @@
 import copy
 import math
-from node import Node
+from drone_world.planner.low_level.local_search_goal.node import Node
 from drone_world.drone_world import DroneWorld
 
 class DroneWorldGoal(object):

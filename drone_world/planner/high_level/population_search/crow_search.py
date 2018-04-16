@@ -3,7 +3,7 @@ import copy
 from drone_world.planner.high_level.population_search.population_search import PopulationAlgorithm
 
 class CrowSearch(PopulationAlgorithm):
-    def __init__(self, blocks, goal):
+    def __init__(self, blocks, goal, world):
         self.maxiter = 40
         self.NC = 20 # number of crows
         self.FL = 1.3 # flight length
@@ -11,7 +11,7 @@ class CrowSearch(PopulationAlgorithm):
         self.Mem = [] # memory for food position
         self.Pos = [] # current position of crows
 
-        super(CrowSearch, self).__init__(blocks, goal, False)
+        super(CrowSearch, self).__init__(blocks, goal, world, False)
 
     # randomly assign a crow to the search space
     def _initialize_crows(self):

@@ -79,7 +79,7 @@ class CrowSearchPlanner(object):
                 block_goals.append((color, x, y, z))
 
         # Run crow search
-        csa = CrowSearch(self.drone_world.state(), block_goals)
+        csa = CrowSearch(self.drone_world.state(), block_goals, self.drone_world)
         fitness, best = csa.run()
 
         self.goal_objectives = csa.get_actions()

@@ -61,7 +61,7 @@ class PopulationAlgorithm(object):
 
         return PopulationAlgorithm.sort_goal_y_ascending(filled_goal)
 
-    def __init__(self, blocks, goal, debug=False):
+    def __init__(self, blocks, goal, world, debug=False):
         """Abstract tower planner class.
         NOTE - Covered blocks will not be added into solution.
         NOTE - Tower location will be built at the current x, y, z location of the drone
@@ -75,6 +75,7 @@ class PopulationAlgorithm(object):
         self.debug = debug
         self.blocks = {}
         self._organize_blocks()
+        self.drone_world = world
 
     def _organize_blocks(self):
         """Organize blocks into 4 different colors.
@@ -159,6 +160,15 @@ class PopulationAlgorithm(object):
             color, x, y, z = solution[i]
             goal_color, goal_x, goal_y, goal_z = self.goal[i]
 
+            cover_block_cnt = 0
+            tmp_y = y+1
+            while(True):
+                if self.drone_world.can_move_object(x, tmp_y, z):
+                    break
+                else:
+                    cover_block_cnt += 1
+                    tmp_y += 1
+            print(cover_block_cnt)
             # Typically drone_y should be equal to zero
             fitness += self._distance(x, y, z, goal_x, goal_y, goal_z) #Drone current location to block
         return fitness
