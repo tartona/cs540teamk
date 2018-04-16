@@ -1,0 +1,6 @@
+0 0 0 red
+0 1 0 white
+0 0 4 blue
+0 0 5 white
+10 10 0 blue
+10 10 10 drone
