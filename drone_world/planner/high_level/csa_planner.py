@@ -26,9 +26,8 @@ class CrowSearchPlanner(object):
             raise TypeError("World must be of type DroneWorld")
         self.drone_world = world
         self.raw_objects = []
-        self.used_blocks = []
-        self.unused_blocks = []
         self.goal_objectives = []
+        self.drone_objective = None
 
         # Metric counters
         self.runtime = None
@@ -80,12 +79,15 @@ class CrowSearchPlanner(object):
             x, y, z, color = item
             if not re.search("drone", color, re.IGNORECASE):
                 block_goals.append((color, x, y, z))
+            else:
+                self.drone_objective = (x, y, z)
 
         # Run crow search
         csa = CrowSearch(self.drone_world, self.drone_world.state(), block_goals)
         fitness, best = csa.run()
 
         self.goal_objectives = csa.get_actions()
+        self.goal_objectives.append((self.drone_objective, None))
         return
 
     def _run_objective(self, objective):
@@ -109,7 +111,7 @@ class CrowSearchPlanner(object):
         if self.debug and release_component:
             print "HL: Attach command at ({} {} {})".format(x, y, z)
         elif self.debug:
-            print "HL: Move command at ({} {} {})".format(x, y, z)
+            print "HL: Move command to ({} {} {})".format(x, y, z)
 
         attach_tabu_search = TabuPlanner(x, y, z, self.drone_world, mem_limit=100, max_iters=0, debug=self.debug)
         try:
