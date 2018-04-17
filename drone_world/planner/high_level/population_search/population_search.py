@@ -51,7 +51,7 @@ class PopulationAlgorithm(object):
 
         # Each entry in goal list is (color, x, y, z) so sort on y value
         sorted_goal = copy.deepcopy(goal)
-        sorted(sorted_goal, key=lambda x: x[2])
+        sorted_goal.sort(key=lambda x: x[2])
         return sorted_goal
 
     @staticmethod
