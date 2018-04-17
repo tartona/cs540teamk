@@ -5,7 +5,6 @@ class Drone(DroneWorldObject):
     def __init__(self, world, x, y, z, color):
         super(Drone, self).__init__(world, x, y, z, color)
         self._attached_block = None
-        self._moves = 0
 
     def is_attached(self):
         return self._attached_block is not None
