@@ -22,6 +22,27 @@ class PopulationAlgorithm(object):
         return filtered_object
 
     @staticmethod
+    def filter_out_columns(blocks, y_max):
+        """Given a set of blocks, filter out any blocks that make a column going to y_max.
+        :param blocks:
+        :param y_max:
+        :return: objects
+        """
+        bad_xz_pair = []
+        filtered_blocks = []
+        for block in blocks:
+            color, x, y, z = block
+            if y == y_max:
+                bad_xz_pair.append((x, z))
+
+        for block in blocks:
+            color, x, y, z = block
+            if (x, z) not in bad_xz_pair:
+                filtered_blocks.append(block)
+
+        return filtered_blocks
+
+    @staticmethod
     def sort_goal_y_ascending(goal):
         """Sort a goal ascneding the y-values
         :param goal: Block vector
@@ -87,6 +108,7 @@ class PopulationAlgorithm(object):
 
         self.s_best = None
         self.raw_blocks = PopulationAlgorithm.filter_out_drone(blocks)
+        self.raw_blocks = PopulationAlgorithm.filter_out_columns(self.raw_blocks, drone_world.y_max)
         self.goal = PopulationAlgorithm.fill_goal(goal)
         self.debug = debug
         self.blocks = {}
