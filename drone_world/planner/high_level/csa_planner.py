@@ -52,11 +52,9 @@ class CrowSearchPlanner(object):
                 self.raw_objects.append((int(row[0]), int(row[1]), int(row[2]), str(row[3])))
 
     def _parse_objects(self):
-        """Parse the raw objects in goal and dump objects.
+        """Parse the raw objects in goal objects.
 
-        A goal object is a block which must be used to complete the objective. A dump objective
-        is a block which must be moved (dumped) to another location in order to uncover a goal
-        objective block. In addition, a list of used and unused blocks may be maintained.
+        A goal object is a block which must be used to complete the objective.
 
         An objective is broken up into two components:
         1. Attach component plus (x, y, z) location
