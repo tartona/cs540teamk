@@ -7,7 +7,7 @@ if __name__ == "__main__":
     world.initialize("world_states/stacked_blocks/initial.txt")
     DroneWorldFigure(world).show()
 
-    csa_planner = CrowSearchPlanner(world)
+    csa_planner = CrowSearchPlanner(world, debug=True)
     csa_planner.initialize("world_states/stacked_blocks/goal.txt")
     csa_planner.run()
 

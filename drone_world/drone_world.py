@@ -89,6 +89,24 @@ class DroneWorld(object):
                 return False
         return True
 
+    def can_move_drone(self, new_x, new_y, new_z):
+        """Verify that the drone can move to the specified location.
+        """
+        if self.is_drone_attached():
+            return self.can_move_object(new_x, new_y, new_z) and self.can_move_object(new_x, new_y - 1, new_z)
+        else:
+            return self.can_move_object(new_x, new_y, new_z)
+
+    def is_occupied_by_block(self, x, y, z):
+        """Check to see if location is occuppied by a block.
+        :return: bool
+        """
+        for block in self._blocks:
+            if (x, y, z) == block.location():
+                return True
+        return False
+
+
     def get_drone_location(self):
         """Get the current drone (x, y, z) location.
         """

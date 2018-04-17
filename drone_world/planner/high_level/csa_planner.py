@@ -6,6 +6,7 @@ from drone_world.planner.high_level.population_search.crow_search import CrowSea
 from drone_world.planner.low_level.tabu_planner import TabuPlanner
 from drone_world.planner.low_level.tabu_planner import LLDumpSubroutine
 from drone_world.planner.low_level.tabu_planner import LLDroneNoop
+from drone_world.planner.low_level.tabu_planner import LLPathNotFound
 
 class CrowSearchPlanner(object):
     """High level planner use crow search algorithm (CSA).
@@ -16,9 +17,10 @@ class CrowSearchPlanner(object):
     will use the low level Tabu planner for this.
     """
 
-    def __init__(self, world):
+    def __init__(self, world, debug=False):
         """Set the drone world for the CSA planner
         :param world: Drone world
+        :param debug: Run with extra print statements
         """
         if not isinstance(world, DroneWorld):
             raise TypeError("World must be of type DroneWorld")
@@ -31,6 +33,9 @@ class CrowSearchPlanner(object):
         # Metric counters
         self.runtime = None
         self.moves = None
+
+        # Debug arg
+        self.debug = debug
 
     def get_runtime(self):
         return self.runtime
@@ -69,9 +74,6 @@ class CrowSearchPlanner(object):
         # Assume that the goals do not contain a question mark
         # TODO: Fix the above assumption
 
-        # TODO: Uncover blocks
-        # TODO: Swap incorrect color blocks
-
         # Separate block from drone goal
         block_goals = []
         for item in self.raw_objects:
@@ -103,7 +105,13 @@ class CrowSearchPlanner(object):
         # finds the goal state.
         # Set the Tabu structure to a reasonable size to help navigate obstacles
         x, y, z = int(attach_component[0]), int(attach_component[1]), int(attach_component[2])
-        attach_tabu_search = TabuPlanner(x, y, z, self.drone_world, mem_limit=100, max_iters=0)
+
+        if self.debug and release_component:
+            print "HL: Attach command at ({} {} {})".format(x, y, z)
+        elif self.debug:
+            print "HL: Move command at ({} {} {})".format(x, y, z)
+
+        attach_tabu_search = TabuPlanner(x, y, z, self.drone_world, mem_limit=100, max_iters=0, debug=self.debug)
         try:
             attach_tabu_search.run()
         except LLDroneNoop:
@@ -114,11 +122,17 @@ class CrowSearchPlanner(object):
 
         # Perform the release component
         x, y, z = int(release_component[0]), int(release_component[1]), int(release_component[2])
-        release_tabu_search = TabuPlanner(x, y, z, self.drone_world, mem_limit=100, max_iters=0)
+
+        if self.debug:
+            print "HL: Release command at ({} {} {})".format(x, y, z)
+
+        release_tabu_search = TabuPlanner(x, y, z, self.drone_world, mem_limit=100, max_iters=0, debug=self.debug)
         try:
             release_tabu_search.run()
-        except LLDumpSubroutine:
+        except (LLDumpSubroutine, LLPathNotFound):
             raise
+        except LLDroneNoop:
+            pass
         finally:
             self.drone_world.release()
 
@@ -138,10 +152,11 @@ class CrowSearchPlanner(object):
             for goal_objective in self.goal_objectives:
                 try:
                     self._run_objective(goal_objective)
-                except LLDumpSubroutine:
+                except (LLDumpSubroutine, LLPathNotFound) as e:
+                    if self.debug:
+                        print str(e)
+                        print "HL: Performing a HL planner re-plan"
                     break
-                except LLDroneNoop:
-                    pass
             else:
                 # Success is set true if for loop completes (the break call is not hit)
                 success = True
