@@ -132,7 +132,7 @@ class TabuPlanner(object):
             y_height += 1
 
         if self.debug:
-            print "LL: Number of blocks dump subroutine needs to move {}".format(y_height)
+            print "LL: Number of blocks dump subroutine needs to move {}".format(y_height + 1)
 
         while y_height >= 0:
 
@@ -240,6 +240,9 @@ class TabuPlanner(object):
             raise LLPathNotFound("Unable to find solution within {} iterations".format(self.max_iters))
         if not isinstance(solution, Node):
             raise TypeError("Expected solution to be of type Node")
+
+        if self.debug:
+            print "LL: Drone moved to objetive location to ({} {} {})".format(self.goal_x, self.goal_y, self.goal_z)
 
         # Apply the solution to actual drone world
         self._apply_solution(solution)

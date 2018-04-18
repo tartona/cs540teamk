@@ -36,7 +36,7 @@ class DroneWorld(object):
             raise RuntimeError("Drone is already allocated in the world")
         if not self.can_move_object(x, y, z):
             raise ValueError("Cannot allocate drone at occupied location ({}, {}, {})".format(x, y, z))
-        self._drone = Drone(self, x, y, z, "black")
+        self._drone = Drone(self, x, y, z, "pink")
 
     def add_block(self, x, y, z, obj_id):
         """Add a block to the world.

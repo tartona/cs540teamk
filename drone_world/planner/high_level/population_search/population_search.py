@@ -17,7 +17,7 @@ class PopulationAlgorithm(object):
         filtered_object = []
         for item in objects:
             color, x, y, z = item
-            if not re.search("black", color, re.IGNORECASE):
+            if not re.search("pink", color, re.IGNORECASE):
                 filtered_object.append((color, x, y, z))
         return filtered_object
 

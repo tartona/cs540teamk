@@ -85,7 +85,8 @@ class CrowSearchPlanner(object):
         fitness, best = csa.run()
 
         self.goal_objectives = csa.get_actions()
-        self.goal_objectives.append((self.drone_objective, None))
+        if self.drone_objective:
+            self.goal_objectives.append((self.drone_objective, None))
         return
 
     def _run_objective(self, objective):
