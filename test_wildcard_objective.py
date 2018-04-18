@@ -4,11 +4,11 @@ from drone_world.figure.drone_world_figure import DroneWorldFigure
 
 if __name__ == "__main__":
     world = DroneWorld()
-    world.initialize("world_states/floating_objective/initial.txt")
+    world.initialize("world_states/wildcard_objective/initial.txt")
     DroneWorldFigure(world).show()
 
     csa_planner = CrowSearchPlanner(world)
-    csa_planner.initialize("world_states/floating_objective/goal.txt")
+    csa_planner.initialize("world_states/wildcard_objective/goal.txt")
     csa_planner.run()
 
     DroneWorldFigure(world).show()

@@ -42,13 +42,17 @@ class CrowSearchPlanner(object):
     def get_moves(self):
         return self.drone_world.get_drone_move_counter()
 
-    """First cut at a hack address wildcard entries"""
+    """ Simple rewrite of input file  address wildcard entries
+        Assumes that a floating block (i.e. a goal of having a block levitating 
+        in space is not a goal"""
+
     def _parse_raw_objects(self, item):
         item_list = list(item)
         coord_index = 0
+        new_coord = 0
         for coordinate in item_list:
             if (coordinate == '?'):
-                item_list[coord_index] = 0
+                item_list[coord_index] = str(new_coord)
             coord_index = coord_index + 1
         return tuple(item_list)
 
