@@ -7,6 +7,7 @@ if __name__ == "__main__":
     world.initialize("world_states/floating_objective/initial.txt")
     DroneWorldFigure(world).show()
 
+
     csa_planner = CrowSearchPlanner(world, debug=True)
     csa_planner.initialize("world_states/floating_objective/goal.txt")
     csa_planner.run()
