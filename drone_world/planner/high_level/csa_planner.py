@@ -42,6 +42,18 @@ class CrowSearchPlanner(object):
     def get_moves(self):
         return self.drone_world.get_drone_move_counter()
 
+    """First cut at a hack address wildcard entries"""
+    def _parse_raw_objects(self, item):
+        item_list = list(item)
+        coord_index = 0
+        for coordinate in item_list:
+            if (coordinate == '?'):
+                item_list[coord_index] = 0
+            coord_index = coord_index + 1
+        return tuple(item_list)
+
+
+
     def initialize(self, filename):
         """Read in a list of objectives from a file.
         :param filename: File to be read in
@@ -49,7 +61,12 @@ class CrowSearchPlanner(object):
         with open(filename, "rt") as csv_file:
             reader = csv.reader(csv_file, delimiter=" ")
             for row in reader:
-                self.raw_objects.append((int(row[0]), int(row[1]), int(row[2]), str(row[3])))
+                if '?' in row:
+                    parsed_row = self._parse_raw_objects(row)
+                    self.raw_objects.append((int(parsed_row[0]), int(parsed_row[1]), int(parsed_row[2]), str(parsed_row[3])))
+                else:
+                    self.raw_objects.append((int(row[0]), int(row[1]), int(row[2]), str(row[3])))
+
 
     def _parse_objects(self):
         """Parse the raw objects in goal objects.
