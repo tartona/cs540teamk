@@ -66,7 +66,7 @@ class CrowSearchPlanner(object):
 
 
         items = [coords[0], coords[1], coords[2], node_color]
-        print items
+
         return tuple(items)
 
     def initialize(self, filename):
