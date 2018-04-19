@@ -35,12 +35,44 @@ class CrowSearchPlanner(object):
 
         # Debug arg
         self.debug = debug
+        self.added_objects=self.drone_world.state()
+        self.object_count = 0
 
     def get_runtime(self):
         return self.runtime
 
     def get_moves(self):
         return self.drone_world.get_drone_move_counter()
+
+    """ Simple rewrite of input file  address wildcard entries
+            Assumes that a floating block (i.e. a goal of having a block levitating 
+            in space is not a goal"""
+
+    def _parse_raw_objects(self, item):
+
+        items = list(item)
+        coords = [items[0], items[1], items[2]]
+        node_color = items[3]
+
+
+        coord_index = 0
+        new_coord = 0
+
+
+        for coordinate in coords:
+            if (coordinate == '?'):
+                coords[coord_index] = str(new_coord)
+            coord_index = coord_index + 1
+
+        # inelegant approach to addressing block wildcards
+        if node_color == '?':
+            node = list(self.added_objects[self.object_count])
+            node_color = node[0]
+        self.object_count += 1
+        
+        items = [coords[0], coords[1], coords[2], node_color]
+        print items
+        return tuple(items)
 
     def initialize(self, filename):
         """Read in a list of objectives from a file.
@@ -49,7 +81,11 @@ class CrowSearchPlanner(object):
         with open(filename, "rt") as csv_file:
             reader = csv.reader(csv_file, delimiter=" ")
             for row in reader:
-                self.raw_objects.append((int(row[0]), int(row[1]), int(row[2]), str(row[3])))
+                if '?' in row:
+                    parsed_row = self._parse_raw_objects(row)
+                    self.raw_objects.append((int(parsed_row[0]), int(parsed_row[1]), int(parsed_row[2]), str(parsed_row[3])))
+                else:
+                    self.raw_objects.append((int(row[0]), int(row[1]), int(row[2]), str(row[3])))
 
     def _parse_objects(self):
         """Parse the raw objects in goal objects.
