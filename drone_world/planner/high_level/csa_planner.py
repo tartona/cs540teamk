@@ -64,12 +64,7 @@ class CrowSearchPlanner(object):
                 coords[coord_index] = str(new_coord)
             coord_index = coord_index + 1
 
-        # inelegant approach to addressing block wildcards
-        if node_color == '?':
-            node = list(self.added_objects[self.object_count])
-            node_color = node[0]
-        self.object_count += 1
-        
+
         items = [coords[0], coords[1], coords[2], node_color]
         print items
         return tuple(items)
