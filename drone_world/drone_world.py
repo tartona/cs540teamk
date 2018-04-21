@@ -4,7 +4,7 @@ from object.block import Block
 from object.drone import Drone
 
 class DroneWorld(object):
-    def __init__(self, x_min=-50, x_max=50, y_min=0, y_max=50, z_min=-50, z_max=50, swap_yz=False):
+    def __init__(self, x_min=-50, x_max=50, y_min=0, y_max=50, z_min=-50, z_max=50, swap_yz=False, trace=False):
         # Verify drone world dimensions
         if x_min > x_max:
             raise ValueError("Drone world x-min cannot be less than x-max")
@@ -19,10 +19,14 @@ class DroneWorld(object):
         self.y_max = y_max
         self.z_max = z_max
         self.swap_yz = swap_yz
+        self.trace = trace
 
         # List of objects populated in the world
         self._drone = None
         self._blocks = []
+
+        # Traced drone locations
+        self._trace = []
 
     def get_drone_move_counter(self):
         """Get the total number of moves for the drone.
@@ -129,7 +133,12 @@ class DroneWorld(object):
     def move(self, dx, dy, dz):
         """Move the drone in the drone world.
         """
-        return self._drone.move(dx, dy, dz)
+        did_move = self._drone.move(dx, dy, dz)
+        if did_move and self.trace:
+            trace_element = ("gray", self._drone.x, self._drone.y, self._drone.z)
+            if trace_element not in self._trace:
+                self._trace.append(trace_element)
+        return did_move
 
     def speak(self, msg):
         """Not implemented.
@@ -144,6 +153,9 @@ class DroneWorld(object):
             state.append(block.state())
         state.append(self._drone.state())
         return state
+
+    def get_trace(self):
+        return self._trace
 
     def initialize(self, filename):
         """Initialize the drone world from a file.

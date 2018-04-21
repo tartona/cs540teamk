@@ -19,8 +19,34 @@ class DroneWorldFigureLite(object):
         self._draw_blocks()
 
     def _draw_blocks(self):
+        drawed_location = []
+
         for state in self.world.state():
             color, x, y, z = state
+            location = (x, y, z)
+            if location not in drawed_location:
+                drawed_location.append(location)
+            else:
+                continue
+
+            # Need to swap y and z values
+            tmp = y
+            y = z
+            z = tmp
+
+            # vertices of a cube
+            v = np.array(
+                [[x, y, z]]
+            )
+            self.ax.scatter3D(v[:, 0], v[:, 1], v[:, 2], c=color)
+
+        for trace in self.world.get_trace():
+            color, x, y, z = trace
+            location = (x, y, z)
+            if location not in drawed_location:
+                drawed_location.append(location)
+            else:
+                continue
 
             # Need to swap y and z values
             tmp = y
@@ -53,8 +79,54 @@ class DroneWorldFigure(object):
         self._draw_blocks()
 
     def _draw_blocks(self):
+        drawed_location = []
+
         for state in self.world.state():
             color, x, y, z = state
+            location = (x, y, z)
+            if location not in drawed_location:
+                drawed_location.append(location)
+            else:
+                continue
+
+            # Need to swap y and z values
+            tmp = y
+            y = z
+            z = tmp
+
+            # vertices of a cube
+            v = np.array(
+                [[x, y, z],
+                 [x, y, z + 1],
+                 [x, y + 1, z],
+                 [x, y + 1, z + 1],
+                 [x + 1, y, z],
+                 [x + 1, y, z + 1],
+                 [x + 1, y + 1, z],
+                 [x + 1, y + 1, z + 1]]
+            )
+            self.ax.scatter3D(v[:, 0], v[:, 1], v[:, 2], c=color)
+
+            # generate list of sides' polygons of our pyramid
+            verts = [
+                [v[0], v[2], v[3], v[1]],
+                [v[0], v[4], v[5], v[1]],
+                [v[4], v[6], v[7], v[5]],
+                [v[6], v[2], v[3], v[7]],
+                [v[0], v[4], v[6], v[2]],
+                [v[1], v[5], v[7], v[3]]
+            ]
+
+            # plot sides
+            self.ax.add_collection3d(Poly3DCollection(verts, facecolors=color, linewidths=1, edgecolors='black', alpha=.25))
+
+        for trace in self.world.get_trace():
+            color, x, y, z = trace
+            location = (x, y, z)
+            if location not in drawed_location:
+                drawed_location.append(location)
+            else:
+                continue
 
             # Need to swap y and z values
             tmp = y

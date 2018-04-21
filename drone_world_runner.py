@@ -14,11 +14,12 @@ def parse_args():
     parser.add_argument("--swap_yz", action="store_true", help="Swap the YZ coordinates in init and goal file", default=False)
     parser.add_argument("--mem_limit", type=int, help="Size of the LL Tabu structure", default=100)
     parser.add_argument("--max_iters", type=int, help="Max number of LL iterations be HL objective", default=0)
+    parser.add_argument("--trace", action="store_true", help="Trace the drone locations", default=False)
     return parser.parse_args()
 
 if __name__ == "__main__":
     args = parse_args()
-    world = DroneWorld(swap_yz=args.swap_yz)
+    world = DroneWorld(swap_yz=args.swap_yz, trace=args.trace)
     world.initialize(args.init_file)
 
     if args.graphics:
