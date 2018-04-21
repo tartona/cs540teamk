@@ -12,6 +12,8 @@ def parse_args():
     parser.add_argument("--debug", action="store_true", help="Print debug messages", default=False)
     parser.add_argument("--graphics", action="store_true", help="Display init and end drone world", default=False)
     parser.add_argument("--swap_yz", action="store_true", help="Swap the YZ coordinates in init and goal file", default=False)
+    parser.add_argument("--mem_limit", type=int, help="Size of the LL Tabu structure", default=100)
+    parser.add_argument("--max_iters", type=int, help="Max number of LL iterations be HL objective", default=0)
     return parser.parse_args()
 
 if __name__ == "__main__":
@@ -22,7 +24,7 @@ if __name__ == "__main__":
     if args.graphics:
         DroneWorldFigure(world).show()
 
-    csa_planner = CrowSearchPlanner(world, debug=args.debug, swap_yz=args.swap_yz)
+    csa_planner = CrowSearchPlanner(world, debug=args.debug, swap_yz=args.swap_yz, ll_mem_limit=args.mem_limit, ll_max_iters=args.max_iters)
     csa_planner.initialize(args.goal_file)
     csa_planner.run()
 

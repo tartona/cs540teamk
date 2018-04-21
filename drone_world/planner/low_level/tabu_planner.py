@@ -251,4 +251,4 @@ class TabuPlanner(object):
         # planner. So, raise a exception to notify the high level planner that this subroutine was
         # ran.
         if not can_move:
-            raise LLDumpSubroutine("LL dump subroutine was ran")
+            raise LLDumpSubroutine("LL: Dump subroutine was ran")

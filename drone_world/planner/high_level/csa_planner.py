@@ -17,7 +17,7 @@ class CrowSearchPlanner(object):
     will use the low level Tabu planner for this.
     """
 
-    def __init__(self, world, debug=False, swap_yz=False):
+    def __init__(self, world, debug=False, swap_yz=False, ll_mem_limit=100, ll_max_iters=0):
         """Set the drone world for the CSA planner
         :param world: Drone world
         :param debug: Run with extra print statements
@@ -33,6 +33,8 @@ class CrowSearchPlanner(object):
         # Metric counters
         self.runtime = None
         self.replan_count = 0
+        self.ll_mem_limit = ll_mem_limit
+        self.ll_max_iters = ll_max_iters
 
         # Debug arg
         self.debug = debug
@@ -168,7 +170,7 @@ class CrowSearchPlanner(object):
         if self.debug:
             print "HL: Release command at ({} {} {})".format(x, y, z)
 
-        release_tabu_search = TabuPlanner(x, y, z, self.drone_world, mem_limit=100, max_iters=0, debug=self.debug)
+        release_tabu_search = TabuPlanner(x, y, z, self.drone_world, mem_limit=self.ll_mem_limit, max_iters=self.ll_max_iters, debug=self.debug)
         try:
             release_tabu_search.run()
         except (LLDumpSubroutine, LLPathNotFound):
