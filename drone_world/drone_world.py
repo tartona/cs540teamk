@@ -4,7 +4,7 @@ from object.block import Block
 from object.drone import Drone
 
 class DroneWorld(object):
-    def __init__(self, x_min=-50, x_max=50, y_min=0, y_max=50, z_min=-50, z_max=50):
+    def __init__(self, x_min=-50, x_max=50, y_min=0, y_max=50, z_min=-50, z_max=50, swap_yz=False):
         # Verify drone world dimensions
         if x_min > x_max:
             raise ValueError("Drone world x-min cannot be less than x-max")
@@ -18,6 +18,7 @@ class DroneWorld(object):
         self.x_max = x_max
         self.y_max = y_max
         self.z_max = z_max
+        self.swap_yz = swap_yz
 
         # List of objects populated in the world
         self._drone = None
@@ -150,7 +151,10 @@ class DroneWorld(object):
         with open(filename, "rt") as csv_file:
             reader = csv.reader(csv_file, delimiter=" ")
             for row in reader:
-                self.add_object(int(row[0]), int(row[1]), int(row[2]), str(row[3]))
+                if self.swap_yz:
+                    self.add_object(int(row[0]), int(row[2]), int(row[1]), str(row[3]))
+                else:
+                    self.add_object(int(row[0]), int(row[1]), int(row[2]), str(row[3]))
 
     def actions(self):
         """Get all the actions for the drone.

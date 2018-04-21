@@ -17,7 +17,7 @@ class CrowSearchPlanner(object):
     will use the low level Tabu planner for this.
     """
 
-    def __init__(self, world, debug=False):
+    def __init__(self, world, debug=False, swap_yz=False):
         """Set the drone world for the CSA planner
         :param world: Drone world
         :param debug: Run with extra print statements
@@ -28,10 +28,11 @@ class CrowSearchPlanner(object):
         self.raw_objects = []
         self.goal_objectives = []
         self.drone_objective = None
+        self.swap_yz = swap_yz
 
         # Metric counters
         self.runtime = None
-        self.moves = None
+        self.replan_count = 0
 
         # Debug arg
         self.debug = debug
@@ -43,6 +44,9 @@ class CrowSearchPlanner(object):
 
     def get_moves(self):
         return self.drone_world.get_drone_move_counter()
+
+    def get_replan_count(self):
+        return self.replan_count
 
     """ Simple rewrite of input file  address wildcard entries
             Assumes that a floating block (i.e. a goal of having a block levitating 
@@ -78,9 +82,15 @@ class CrowSearchPlanner(object):
             for row in reader:
                 if '?' in row:
                     parsed_row = self._parse_raw_objects(row)
-                    self.raw_objects.append((int(parsed_row[0]), int(parsed_row[1]), int(parsed_row[2]), str(parsed_row[3])))
+                    if self.swap_yz:
+                        self.raw_objects.append((int(parsed_row[0]), int(parsed_row[2]), int(parsed_row[1]), str(parsed_row[3])))
+                    else:
+                        self.raw_objects.append((int(parsed_row[0]), int(parsed_row[1]), int(parsed_row[2]), str(parsed_row[3])))
                 else:
-                    self.raw_objects.append((int(row[0]), int(row[1]), int(row[2]), str(row[3])))
+                    if self.swap_yz:
+                        self.raw_objects.append((int(row[0]), int(row[2]), int(row[1]), str(row[3])))
+                    else:
+                        self.raw_objects.append((int(row[0]), int(row[1]), int(row[2]), str(row[3])))
 
     def _parse_objects(self):
         """Parse the raw objects in goal objects.
@@ -185,6 +195,7 @@ class CrowSearchPlanner(object):
                 try:
                     self._run_objective(goal_objective)
                 except (LLDumpSubroutine, LLPathNotFound) as e:
+                    self.replan_count += 1
                     if self.debug:
                         print str(e)
                         print "HL: Performing a HL planner re-plan"
