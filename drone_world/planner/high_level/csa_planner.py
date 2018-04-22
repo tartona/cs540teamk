@@ -17,7 +17,7 @@ class CrowSearchPlanner(object):
     will use the low level Tabu planner for this.
     """
 
-    def __init__(self, world, debug=False, swap_yz=False, ll_mem_limit=100, ll_max_iters=0):
+    def __init__(self, world, world2, debug=False, swap_yz=False, ll_mem_limit=100, ll_max_iters=0):
         """Set the drone world for the CSA planner
         :param world: Drone world
         :param debug: Run with extra print statements
@@ -25,6 +25,7 @@ class CrowSearchPlanner(object):
         if not isinstance(world, DroneWorld):
             raise TypeError("World must be of type DroneWorld")
         self.drone_world = world
+        self.world2 = world2
         self.raw_objects = []
         self.goal_objectives = []
         self.drone_objective = None
@@ -151,11 +152,11 @@ class CrowSearchPlanner(object):
         x, y, z = int(attach_component[0]), int(attach_component[1]), int(attach_component[2])
 
         if self.debug and release_component:
-            print "HL: Attach command at ({} {} {})".format(x, y, z)
+            print ("HL: Attach command at ({} {} {})".format(x, y, z))
         elif self.debug:
-            print "HL: Move command to ({} {} {})".format(x, y, z)
+            print ("HL: Move command to ({} {} {})".format(x, y, z))
 
-        attach_tabu_search = TabuPlanner(x, y, z, self.drone_world, mem_limit=100, max_iters=0, debug=self.debug)
+        attach_tabu_search = TabuPlanner(x, y, z, self.drone_world, self.world2, mem_limit=100, max_iters=0, debug=self.debug)
         try:
             attach_tabu_search.run()
         except LLDroneNoop:
@@ -168,9 +169,9 @@ class CrowSearchPlanner(object):
         x, y, z = int(release_component[0]), int(release_component[1]), int(release_component[2])
 
         if self.debug:
-            print "HL: Release command at ({} {} {})".format(x, y, z)
+            print ("HL: Release command at ({} {} {})".format(x, y, z))
 
-        release_tabu_search = TabuPlanner(x, y, z, self.drone_world, mem_limit=self.ll_mem_limit, max_iters=self.ll_max_iters, debug=self.debug)
+        release_tabu_search = TabuPlanner(x, y, z, self.drone_world, self.world2, mem_limit=self.ll_mem_limit, max_iters=self.ll_max_iters, debug=self.debug)
         try:
             release_tabu_search.run()
         except (LLDumpSubroutine, LLPathNotFound):
@@ -199,8 +200,8 @@ class CrowSearchPlanner(object):
                 except (LLDumpSubroutine, LLPathNotFound) as e:
                     self.replan_count += 1
                     if self.debug:
-                        print str(e)
-                        print "HL: Performing a HL planner re-plan"
+                        print (str(e))
+                        print ("HL: Performing a HL planner re-plan")
                     break
             else:
                 # Success is set true if for loop completes (the break call is not hit)

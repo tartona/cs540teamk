@@ -26,7 +26,7 @@ class TabuPlanner(object):
     a greedy search. Collision avoidance is implemented using a Tabu structure.
     """
 
-    def __init__(self, goal_x, goal_y, goal_z, drone_world, mem_limit=100, max_iters=0, debug=False):
+    def __init__(self, goal_x, goal_y, goal_z, drone_world, world2, mem_limit=100, max_iters=0, debug=False):
         """Build a Tabu search local planner.
         :param goal_x: Desired drone x location
         :param goal_y: Desired drone y location
@@ -48,6 +48,7 @@ class TabuPlanner(object):
             raise ValueError("Invalid memory limit")
 
         self.drone_world = drone_world
+        self.world2 = world2
         self.max_iters = max_iters
         self.mem_limit = mem_limit
         self.goal_x = goal_x
@@ -104,7 +105,7 @@ class TabuPlanner(object):
         dump_y += 1
 
         if self.debug:
-            print "LL: Generated drone dump subroutine location ({} {} {})".format(dump_x, dump_y, dump_z)
+            print ("LL: Generated drone dump subroutine location ({} {} {})".format(dump_x, dump_y, dump_z))
         return dump_x, dump_y, dump_z
 
 
@@ -132,7 +133,7 @@ class TabuPlanner(object):
             y_height += 1
 
         if self.debug:
-            print "LL: Number of blocks dump subroutine needs to move {}".format(y_height + 1)
+            print ("LL: Number of blocks dump subroutine needs to move {}".format(y_height + 1))
 
         while y_height >= 0:
 
@@ -178,7 +179,7 @@ class TabuPlanner(object):
         cached_location = self.drone_world.get_drone_location()
         self.drone_world.release()
         if self.debug:
-            print "LL: Releasing objective block at ({} {} {})".format(cached_location[0], cached_location[1], cached_location[2])
+            print ("LL: Releasing objective block at ({} {} {})".format(cached_location[0], cached_location[1], cached_location[2]))
 
         # Build a blacklist to avoid covering up the block that was just release
         blacklist = []
@@ -195,7 +196,7 @@ class TabuPlanner(object):
         self._apply_solution(solution)
         self.drone_world.attach()
         if self.debug:
-            print "LL: Re-attaching objective block at ({} {} {})".format(cached_location[0], cached_location[1], cached_location[2])
+            print ("LL: Re-attaching objective block at ({} {} {})".format(cached_location[0], cached_location[1], cached_location[2]))
 
         # Done
         return
@@ -205,11 +206,11 @@ class TabuPlanner(object):
         """
         if is_attached:
             if self.debug:
-                print "LL: Running dump block subroutine to uncover/move block at ({} {} {})".format(self.goal_x, self.goal_y - 1, self.goal_z)
+                print ("LL: Running dump block subroutine to uncover/move block at ({} {} {})".format(self.goal_x, self.goal_y - 1, self.goal_z))
             self._dump_block_attached(self.goal_x, self.goal_y, self.goal_z)
         else:
             if self.debug:
-                print "LL: Running dump block subroutine to uncover/move at ({} {} {})".format(self.goal_x, self.goal_y, self.goal_z)
+                print ("LL: Running dump block subroutine to uncover/move at ({} {} {})".format(self.goal_x, self.goal_y, self.goal_z))
             self._dump_block_unattached(self.goal_x, self.goal_y + 1, self.goal_z)
 
     def run(self):
@@ -242,7 +243,7 @@ class TabuPlanner(object):
             raise TypeError("Expected solution to be of type Node")
 
         if self.debug:
-            print "LL: Drone moved to objetive location to ({} {} {})".format(self.goal_x, self.goal_y, self.goal_z)
+            print ("LL: Drone moved to objetive location to ({} {} {})".format(self.goal_x, self.goal_y, self.goal_z))
 
         # Apply the solution to actual drone world
         self._apply_solution(solution)

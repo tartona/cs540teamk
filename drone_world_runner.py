@@ -22,10 +22,13 @@ if __name__ == "__main__":
     world = DroneWorld(swap_yz=args.swap_yz, trace=args.trace)
     world.initialize(args.init_file)
 
+    world2 = DroneWorld(swap_yz=args.swap_yz, trace=args.trace)
+    world2.initialize(args.init_file)
+
     if args.graphics:
         DroneWorldFigure(world).show()
 
-    csa_planner = CrowSearchPlanner(world, debug=args.debug, swap_yz=args.swap_yz, ll_mem_limit=args.mem_limit, ll_max_iters=args.max_iters)
+    csa_planner = CrowSearchPlanner(world, world2, debug=args.debug, swap_yz=args.swap_yz, ll_mem_limit=args.mem_limit, ll_max_iters=args.max_iters)
     csa_planner.initialize(args.goal_file)
     csa_planner.run()
 
@@ -35,6 +38,6 @@ if __name__ == "__main__":
     drone_moves = world.get_drone_move_counter()
     runtime = csa_planner.get_runtime()
     replan_count = csa_planner.get_replan_count()
-    print "Solution provided in " + str(drone_moves) + " moves."
-    print "Solution needed " + str(replan_count) + " replans."
-    print "Runtime in " + str(runtime) + " seconds."
+    print ("Solution provided in " + str(drone_moves) + " moves.")
+    print ("Solution needed " + str(replan_count) + " replans.")
+    print ("Runtime in " + str(runtime) + " seconds.")

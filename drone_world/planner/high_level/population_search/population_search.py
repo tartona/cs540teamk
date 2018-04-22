@@ -160,7 +160,7 @@ class PopulationAlgorithm(object):
 
                 # Grab a random block from the non priority list
                 keys = blocks.keys()
-                random.shuffle(keys)
+                random.shuffle(list(keys))
                 for color_key in blocks:
                     if len(blocks[color_key]) == 0:
                         continue

@@ -1,7 +1,7 @@
 import csv
 import re
-from object.block import Block
-from object.drone import Drone
+from drone_world.object.block import Block
+from drone_world.object.drone import Drone
 
 class DroneWorld(object):
     def __init__(self, x_min=-50, x_max=50, y_min=0, y_max=50, z_min=-50, z_max=50, swap_yz=False, trace=False):
@@ -27,7 +27,7 @@ class DroneWorld(object):
 
         # Traced drone locations
         self._trace = []
-
+ 
     def get_drone_move_counter(self):
         """Get the total number of moves for the drone.
         :return: int
