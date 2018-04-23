@@ -159,8 +159,8 @@ class PopulationAlgorithm(object):
             if re.search("\?", color):
 
                 # Grab a random block from the non priority list
-                keys = blocks.keys()
-                random.shuffle(list(keys))
+                keys = list(blocks.keys())
+                random.shuffle(keys)
                 for color_key in keys:
                     if len(blocks[color_key]) == 0:
                         continue
