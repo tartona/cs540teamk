@@ -193,13 +193,35 @@ class PopulationAlgorithm(object):
         if len(solution) != len(self.goal):
             raise RuntimeError("Solution differs in length from goal")
 
+        penalization_const = (self.drone_world.x_max - self.drone_world.x_min) * (self.drone_world.y_max - self.drone_world.y_min) * (self.drone_world.z_max - self.drone_world.z_min)
+
+        # List of used block locations
+        used_blocks = []
+
         fitness = 0.0
+        drone_x, drone_y, drone_z = self.drone_world.get_drone_location()
         for i in range(0, len(solution)):
             color, x, y, z = solution[i]
             goal_color, goal_x, goal_y, goal_z = self.goal[i]
 
             # Typically drone_y should be equal to zero
-            fitness += self._distance(x, y, z, goal_x, goal_y, goal_z) #Drone current location to block
+            fitness += self._distance(x, y, z, drone_x, drone_y, drone_z) #Drone current location to block
+            fitness += self._distance(x, y, z, goal_x, goal_y, goal_z) #Block location to goal
+            used_blocks.append((x, y, z))
+
+            # Don't penalize if top covering block is used
+            if (x, y + 1, z) not in used_blocks:
+
+                # Check to see how covered the block is
+                y_height = 1
+                while self.drone_world.is_occupied_by_block(x, y + y_height, z):
+                    y_height += 1
+
+                # Penalize based on number of covered blocks
+                fitness += (y_height - 1) * penalization_const
+
+            # Update the drone location
+            drone_x, drone_y, drone_z = goal_x, goal_y + 1, goal_z
         return fitness
 
     @abstractmethod
